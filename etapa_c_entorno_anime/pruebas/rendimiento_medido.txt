@@ -1,0 +1,2 @@
+[medida] estilo=v13 fotogramas=120 ms=1750.97 fps=0.57 dibujos=333 triangulos=750152
+[medida] estilo=anime fotogramas=120 ms=1029.76 fps=0.97 dibujos=394 triangulos=909690
