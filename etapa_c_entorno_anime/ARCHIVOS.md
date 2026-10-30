@@ -2,6 +2,35 @@
 
 Las rutas de `proyecto/` son las mismas que dentro del proyecto Godot (`res://`).
 
+## Revisión C3
+
+### Nuevos en la C3
+| Archivo | Qué es |
+|---|---|
+| `proyecto/scenes/pruebas/PruebaEntornoAnimeC3.tscn` | Escena de prueba C3 (aislada) |
+| `proyecto/scripts/anime/prueba_entorno_c3.gd` | `PruebaEntornoC3 extends PruebaEntornoC2`: bosque de 7 especies en MultiMesh, primer plano, rocas, raíces, lianas, noche, capturas |
+| `proyecto/scripts/anime/selva_c3.gd` | Especies nuevas (monumental, pisos, cecropia, inclinado), raíces, luciérnagas, material de suelo C3 |
+| `proyecto/assets/materials/anime/anime_suelo_selva_c3.gdshader` | Suelo C3 (rocas, roderas, piedrecillas, musgo, luna) |
+| `proyecto/assets/materials/anime/anime_luciernaga.gdshader` | Luciérnagas |
+| `proyecto/tests/entorno_c3_tests.gd` | 21 pruebas nuevas |
+
+### Modificados en la C3
+| Archivo | Cambio |
+|---|---|
+| `proyecto/tests/e2e_director.gd` | Ejecuta también las pruebas C3 |
+| `proyecto/CHANGELOG.md` | Entrada de la revisión C3 |
+
+Ningún archivo de la C2, la C1, la Etapa B ni el v13 se ha modificado en la C3.
+
+### Carpetas nuevas de la C3
+- `capturas_c3/`: 17 capturas reales de Godot 4.7.2 (Forward+).
+- `comparaciones_c3/`: 12 láminas C2 | C3 con el mismo encuadre y la misma hora, y la hoja del ciclo día-noche C3.
+- `pruebas_c3/`: 317 pruebas, consola de Forward+ y medición.
+
+Las carpetas de la C1 y la C2 se conservan sin cambios.
+
+---
+
 ## Revisión C2
 
 ### Nuevos en la C2

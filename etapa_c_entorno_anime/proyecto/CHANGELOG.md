@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Etapa C anime, revisión C3: selva refinada (2026-10-30)
+
+Escena nueva y aislada `scenes/pruebas/PruebaEntornoAnimeC3.tscn`, construida sobre la C2 (que no
+cambia: su escena, scripts y shaders siguen igual). Validada con Godot 4.7.2.
+
+- `scripts/anime/selva_c3.gd` (`SelvaC3`): especies nuevas (monumental con fustes trenzados, raíces
+  serpenteantes y raíces aéreas; en pisos; cecropia; inclinado), ramas que terminan en ramitas con su
+  racimo, raíces expuestas, luciérnagas.
+- `scripts/anime/prueba_entorno_c3.gd` (`PruebaEntornoC3 extends PruebaEntornoC2`): bosque de 7
+  especies en MultiMesh por variante, árbol monumental como punto focal con corredor de vista, árboles
+  inclinados que enmarcan el camino, plantas grandes en MultiMesh lejos del camino y de las cámaras,
+  rocas en grupos con piedrecillas, raíces hacia la orilla, lianas sobre el camino, noche con luna,
+  bruma azul, borde de luna en las copas, luciérnagas y tres luces suaves.
+- `assets/materials/anime/anime_suelo_selva_c3.gdshader`: suelo C2 más tierra húmeda y musgo al pie de
+  las rocas, roderas y piedrecillas, orilla más irregular, franja de musgo y brillo de luna en el camino.
+- `assets/materials/anime/anime_luciernaga.gdshader`: luciérnagas aditivas orientadas a cámara.
+- `tests/entorno_c3_tests.gd`: 21 pruebas nuevas.
+
 ## Etapa C anime, revisión C2: selva de prueba rehecha (2026-10-30)
 
 Escena nueva y aislada `scenes/pruebas/PruebaEntornoAnimeC2.tscn`. La escena C1, la Etapa B, el juego y

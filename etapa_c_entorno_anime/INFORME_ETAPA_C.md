@@ -1,11 +1,161 @@
 # Etapa C · Entorno selvático anime: informe técnico
 
 **Fecha:** 30 de octubre de 2026
-**Base:** la copia de desarrollo de la Etapa B. La v13 entregada y su copia de seguridad siguen intactas.
-**Estado:** revisión C2 terminada y en espera de tu revisión. La Etapa D no ha empezado.
+**Estado:** revisión C3 terminada y en espera de tu revisión. No está integrada en el mundo principal y no he empezado otra etapa.
 
-Este informe tiene dos partes: primero la **revisión C2** (las correcciones que pediste) y, debajo, el
-informe original de la **versión C1**, que se conserva sin cambios junto con sus capturas.
+El informe tiene tres partes, de la más reciente a la más antigua: **C3**, **C2** y **C1**. Las capturas de C1 y C2 se conservan sin cambios.
+
+---
+
+## Revisión C3
+
+### C3.0 Punto de partida y alcance
+- Antes de cambiar nada revisé la escena, los scripts y los shaders de la C2. La C3 se construye **encima** de la C2, sin modificarla:
+  - `PruebaEntornoC3` hereda de `PruebaEntornoC2`.
+  - `SelvaC3` reutiliza los tubos, racimos, lianas, rocas y suelo de `SelvaC2`.
+  - El suelo C3 es una copia ampliada del shader C2.
+- La escena C2, la C1, el laboratorio de la Etapa B, el juego y el mundo principal **no se han tocado**. No hay cambios de gameplay, personajes, animaciones, controles, cámara del juego, combate, diálogos ni HUD.
+- Escena nueva e independiente: `scenes/pruebas/PruebaEntornoAnimeC3.tscn`. Usa los mismos encuadres y horas que la C2, y añade uno de raíces y rocas, para comparar directamente.
+- Todo se validó con **Godot 4.7.2** (4.7.2.stable.official.ed1daf0bf), Forward+.
+
+### C3.A Variedad de árboles y copas
+- Hay **4 especies nuevas** con siluetas claramente distintas. Junto con las 3 de la C2 y las palmas, dan 8 tipos en el bosque cercano:
+
+  | Especie | Silueta |
+  |---|---|
+  | **Monumental** (higuera gigante) | 26-33 m, tronco de 4-5 fustes trenzados alrededor de un núcleo, 8-10 raíces que serpentean por el suelo, raíces aéreas que bajan de las ramas, copa ancha en dos capas y muchas lianas |
+  | **En pisos** | Tronco recto con 3-4 verticilos de ramas horizontales; copa plana por pisos (pagoda) |
+  | **Cecropia** | Tronco fino y claro con raíces zanco, 3-5 ramas en candelabro y rosetas planas en las puntas |
+  | **Inclinado** | Tronco que sube y se curva; copa alargada al final. Se orienta hacia el camino para enmarcarlo |
+  | Ceiba, redonda y joven (C2) | Se conservan |
+
+- **Transición tronco, ramas y follaje:** en las especies nuevas cada rama termina en 2-3 ramitas, cada una con su racimo, y lleva un racimo menor a media rama. El follaje nace de la madera y no flota sobre ella.
+- **Sin copias:**
+  - Hay 28 variantes, cada una con su semilla.
+  - Al colocarlas se giran y se escalan **de forma no uniforme**: la altura varía del 85 al 120 % respecto al ancho.
+  - Cada variante tiene su propio par de verdes.
+- **Recuento del bosque cercano:** 149 árboles y palmas: 36 redondos, 31 cecropias, 30 jóvenes, 19 en pisos, 19 palmas, 7 ceibas, 4 monumentales y 3 inclinados. El anillo lejano tiene 190 árboles de 4 especies.
+
+### C3.B Vegetación del primer plano
+- **Plantas grandes más contenidas:**
+  - Escalas: monstera 0,9-1,05 (antes 1,3-1,6), platanera 0,7 (antes 0,9) y helecho arborescente 0,55-0,6 (antes 0,6-0,7).
+  - Siempre a **3 m o más del eje del camino** (antes 2,2 m).
+- **Zonas libres delante de cada cámara:** en los primeros 4,5 m de cada encuadre, y alrededor del personaje, no crecen plantas grandes ni árboles. Una prueba lo comprueba sobre las 150 plantas grandes.
+- **Plantas pequeñas más bajas en la orilla:** helecho 1,8 (antes 2,3) e hierba 3,0 (antes 3,6). Hay más calatheas y anthuriums para variar especies y alturas.
+- **Lectura del camino:** el camino queda despejado y el personaje se lee entero en el plano de escala, de día y de noche.
+
+### C3.C Noche cinematográfica
+La exposición general **no se ha subido**: es la misma de día y de noche, y una prueba lo verifica. La lectura nocturna viene de luz selectiva:
+- **Luna** más presente y fría (energía 0,72, azul), con sombras.
+- **Ambiente verde azulado** (0,32 · 0,46 · 0,58, energía 0,62).
+- **Bruma nocturna azul más clara que el cielo:** las siluetas de los árboles se separan por capas de profundidad.
+- **Borde de luz de luna en las copas:** un rim frío que dibuja la silueta de las hojas.
+- **Camino con algo más de valor de noche** (+35 % solo en la tierra del camino), para poder orientarse.
+- **220 luciérnagas** a lo largo del camino, aditivas y con parpadeo, más **3 luces suaves verdosas** junto al camino. Todo se apaga de día.
+- El amanecer y el anochecer pasan por una rampa (19:00-20:30 y 4:30-6:00).
+
+### C3.D Suelo, raíces y rocas
+- **Raíces expuestas:**
+  - 56 raíces salen de los árboles cercanos hacia la orilla del camino, medio enterradas, y **no cruzan el centro del camino**, que se sigue pudiendo recorrer (comprobado en una prueba).
+  - A ellas se suman las 8-10 raíces de cada árbol monumental y las raíces de los inclinados.
+- **Rocas integradas:**
+  - 9 grupos, cada uno con una roca mayor, rocas medianas y 5-9 piedrecillas, más 22 piedras sueltas: 57 rocas en total.
+  - Hundidas un 18 % de su altura y con leve inclinación.
+  - El suelo marca **tierra húmeda oscura al pie de cada roca y un anillo roto de musgo** alrededor.
+  - Hay grupos al pie del árbol monumental y junto a sus raíces.
+- **Camino:**
+  - Orilla más irregular, rota a dos escalas.
+  - Dos roderas compactas a lo largo del camino.
+  - Piedrecillas cerca de la cámara.
+- **Transiciones:** una franja de musgo entre la hojarasca y la hierba sustituye el corte directo.
+
+### C3.E Identidad y escala
+- **Árbol monumental como punto focal** al fondo del camino, unos 60 m por delante del encuadre general. Un **corredor de vista** sin árboles permite verlo desde el inicio del recorrido.
+- **Dos árboles inclinados** que se arquean sobre el camino y lo enmarcan.
+- **Lianas** que cruzan por encima del camino entre las copas de ambos lados, con tramos colgantes.
+- **Vegetación en varios planos:** primer plano bajo, árboles medianos, emergentes, anillo lejano y masa de copas del horizonte.
+- No se añadió ninguna estructura ni construcción.
+
+### C3.F Rendimiento y arquitectura
+- Los árboles, las plantas grandes y las rocas pasan a **MultiMesh**:
+  - Árboles: una por variante y por sector de 60 m.
+  - Plantas grandes y palmas: una por planta.
+  - Rocas: una por forma y material.
+  - Los materiales se comparten entre variantes y no se duplican.
+- Por qué hay sectores: una sola MultiMesh para todo el bosque se dibujaba entera aunque la cámara no la viera, y los triángulos se triplicaban (3,8 M). Con sectores, la cámara y las sombras descartan lo que no ven.
+- El **anillo lejano no proyecta sombras**, porque queda dentro de la bruma.
+- Nodos de dibujo en escena: **C2 467, C3 312**. La prueba lo comprueba.
+- Medición con `-- --medir=20` en el plano general a 1600×900 ([pruebas_c3/rendimiento_medido_472.txt](pruebas_c3/rendimiento_medido_472.txt)):
+
+  | Escena | Llamadas de dibujo | Triángulos | ms/fotograma (llvmpipe) |
+  |---|---|---|---|
+  | C2 | 961 | 1 167 747 | 4913,62 |
+  | C3 | 765 (−20 %) | 1 348 843 (+15 %) | 5170,52 |
+
+- **Importante:** estas cifras son de un contenedor **sin GPU** (Mesa llvmpipe por CPU, Intel Xeon 2,1 GHz, 4 núcleos). Los ms y los FPS **no representan un PC con tarjeta gráfica** y no deben usarse como prueba de rendimiento. Solo comparan llamadas de dibujo y triángulos entre versiones. La prueba en GPU real queda pendiente, como indicaste.
+
+### C3.G Capturas reales de Godot 4.7.2 (Forward+)
+Son 17 capturas a 1600×900, tomadas desde la escena C3 con cámara y hora fijas. No son imágenes generadas ni retocadas. Las láminas solo ponen dos capturas una al lado de la otra.
+
+| # | Pedido | Captura C3 | C2 vs C3 |
+|---|---|---|---|
+| 1 | General de día | [c3](capturas_c3/c3_anime_general_h13_0.jpg) | [lámina](comparaciones_c3/c2_vs_c3_general_h13_0.jpg) |
+| 2 | General al amanecer | [c3](capturas_c3/c3_anime_general_h06_5.jpg) | [lámina](comparaciones_c3/c2_vs_c3_general_h06_5.jpg) |
+| 3 | General al atardecer | [c3](capturas_c3/c3_anime_general_h18_2.jpg) | [lámina](comparaciones_c3/c2_vs_c3_general_h18_2.jpg) |
+| 4 | General de noche | [21 h](capturas_c3/c3_anime_general_h21_0.jpg), [0 h](capturas_c3/c3_anime_general_h00_0.jpg) | [21 h](comparaciones_c3/c2_vs_c3_general_h21_0.jpg), [0 h](comparaciones_c3/c2_vs_c3_general_h00_0.jpg) |
+| 5 | Copas | [c3](capturas_c3/c3_anime_copas_h13_0.jpg) | [lámina](comparaciones_c3/c2_vs_c3_copas_h13_0.jpg) |
+| 6 | Vegetación del suelo | [día](capturas_c3/c3_anime_vegetacion_h13_0.jpg), [noche](capturas_c3/c3_anime_vegetacion_h21_0.jpg) | [lámina](comparaciones_c3/c2_vs_c3_vegetacion_h13_0.jpg) |
+| 7 | Raíces y rocas | [raíces](capturas_c3/c3_anime_raices_h13_0.jpg), [rocas](capturas_c3/c3_anime_rocas_h13_0.jpg) | [raíces](comparaciones_c3/c2_vs_c3_raices_h13_0.jpg), [rocas](comparaciones_c3/c2_vs_c3_rocas_h13_0.jpg) |
+| 8 | Vista elevada | [c3](capturas_c3/c3_anime_profundidad_h13_0.jpg) | [lámina](comparaciones_c3/c2_vs_c3_profundidad_h13_0.jpg) |
+| 9 | Personaje y escala | [día](capturas_c3/c3_anime_escala_h13_0.jpg), [noche](capturas_c3/c3_anime_escala_h21_0.jpg) | [lámina](comparaciones_c3/c2_vs_c3_escala_h13_0.jpg) |
+| 10 | C2 vs C3 | 12 láminas en `comparaciones_c3/` | [ciclo C3](comparaciones_c3/c3_ciclo_dia_noche.jpg) |
+
+![General](comparaciones_c3/c2_vs_c3_general_h13_0.jpg)
+![Noche](comparaciones_c3/c2_vs_c3_general_h21_0.jpg)
+![Raíces](comparaciones_c3/c2_vs_c3_raices_h13_0.jpg)
+![Ciclo](comparaciones_c3/c3_ciclo_dia_noche.jpg)
+
+### C3.H Pruebas funcionales (Godot 4.7.2)
+- **Suite completa `--mode=all`:** **317 de 317 correctas** ([pruebas_c3/resultado_pruebas_mode_all_472.txt](pruebas_c3/resultado_pruebas_mode_all_472.txt)). Son las 296 anteriores más **21 nuevas** de la C3. Las anteriores cubren los sistemas del juego: personajes, combate, diálogos, HUD, guardado y mundo.
+- **Pruebas nuevas de la C3:**
+  - **Carga y shaders:** la escena carga, los shaders de suelo y luciérnagas compilan, y no hay objetos de laboratorio.
+  - **Árboles:** monumental de más de 25 m con raíces, pisos, cecropia e inclinado con su silueta, alturas distintas, 8 tipos en el bosque y MultiMesh.
+  - **Primer plano y suelo:** plantas grandes fuera del camino y de las cámaras, raíces que no bloquean el centro del camino, y rocas en grupos.
+  - **Noche:** luciérnagas y luces solo de noche, noche legible sin subir la exposición, y bruma más clara que el cielo.
+  - **Personaje:** está en el camino, visible en el plano de escala y oculto en los demás.
+  - **Rendimiento:** menos nodos de dibujo que la C2.
+- **Ciclo día-noche:** probado a las 6:30, 9, 13, 16:30, 18:12, 19:30, 21 y 0 h, en capturas y en pruebas.
+- **Consola de Forward+ durante las capturas:** sin errores de scripts, shaders ni recursos faltantes. Solo aparecen los avisos de audio ALSA (el contenedor no tiene tarjeta de sonido). Registro en [pruebas_c3/consola_capturas_forward_plus_472.txt](pruebas_c3/consola_capturas_forward_plus_472.txt).
+- **Cámara del juego y gameplay:** no se han modificado. Las cámaras de la escena de prueba son encuadres fijos de evaluación.
+
+### C3.I Problemas pendientes
+- **Rendimiento en GPU real:** pendiente, como indicaste.
+- **Triángulos:** la C3 tiene un 15 % más de triángulos que la C2, por el bosque más rico, los árboles monumentales, las raíces y las rocas, aunque hace un 20 % menos de llamadas de dibujo. Si en el PC hiciera falta, el siguiente paso sería un LOD del anillo lejano (variantes con menos racimos).
+- **Encuadre de terreno:** a la derecha entra una copa cercana desde arriba. Se lee como marco natural, pero se puede despejar más si lo prefieres.
+- **Copas de cerca:** el atlas de hojas sigue siendo procedural. Un atlas pintado a mano daría más carácter en primer plano.
+- **Amanecer y atardecer:** siguen teniendo una paleta parecida, como ya anoté en la C2.
+- **Sin integrar:** la C3 no está en el mundo principal, como pediste.
+
+### C3.J Archivos
+Nuevos:
+- `scenes/pruebas/PruebaEntornoAnimeC3.tscn`
+- `scripts/anime/prueba_entorno_c3.gd`
+- `scripts/anime/selva_c3.gd`
+- `assets/materials/anime/anime_suelo_selva_c3.gdshader`
+- `assets/materials/anime/anime_luciernaga.gdshader`
+- `tests/entorno_c3_tests.gd`
+
+Modificados:
+- `tests/e2e_director.gd`: ejecuta también las pruebas C3.
+- `CHANGELOG.md`
+
+Ningún archivo de la C2, la C1, la Etapa B ni el v13 cambió. El detalle está en [ARCHIVOS.md](ARCHIVOS.md).
+
+Para abrir la escena: `res://scenes/pruebas/PruebaEntornoAnimeC3.tscn` (F6). Las teclas son:
+- **1 a 8:** encuadres (el 8 es raíces y rocas).
+- **H:** cambia la hora.
+- **O:** activa o desactiva los contornos.
+- **Esc:** vuelve al menú.
 
 ---
 
