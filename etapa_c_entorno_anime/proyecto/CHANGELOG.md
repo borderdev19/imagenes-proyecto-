@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Etapa C anime, revisión C2: selva de prueba rehecha (2026-10-30)
+
+Escena nueva y aislada `scenes/pruebas/PruebaEntornoAnimeC2.tscn`. La escena C1, la Etapa B, el juego y
+el mundo no cambian. Validada con Godot 4.7.2.
+
+- `scripts/anime/selva_c2.gd` (`SelvaC2`): árboles procedurales por especie (ceiba con raíces de
+  tabla, árbol de copa redonda, árbol joven), con ramas reales y copas hechas de racimos de hojas;
+  rocas facetadas con planos de corte y base hundida; suelo con relieve suave y camino; masa de selva
+  lejana para cerrar el horizonte.
+- `assets/materials/anime/anime_copa.gdshader`: racimos de hojas con corte alfa, normales de copa,
+  viento y bandas. Atlas `assets/anime/selva_c2/racimo_hojas.png` (generado con `tools/c2/generar_racimos.py`).
+- `assets/materials/anime/anime_suelo_selva.gdshader`: suelo por zonas con borde definido (camino,
+  hojarasca, musgo, humedad, tres tonos de hierba), sin texturas ni manchas difuminadas.
+- `scripts/anime/prueba_entorno_c2.gd`: bosque con especies según la distancia al camino, sotobosque
+  en manchas, rocas en grupos, luz anime por hora (cielo, bruma, sol y luna), encuadres y capturas
+  con comparación v13 en el mismo sitio.
+- `tests/entorno_c2_tests.gd`: 20 pruebas nuevas.
+
 ## Etapa C anime: entorno selvático de prueba (2026-10-30)
 
 Solo en una escena de prueba nueva. El juego, el mundo y la escena de la Etapa B no cambian; el estilo

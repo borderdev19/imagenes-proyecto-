@@ -1,0 +1,320 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+== Pruebas unitarias de combate ==
+  [OK]   El combate empieza en PLAYER_TURN tras la intro  -> PLAYER_TURN
+  [OK]   Valores iniciales del héroe (HP 135, POW 20)
+  [OK]   ATAQUE aceptado en el turno del jugador
+  [OK]   ATAQUE reduce el HP del enemigo  -> 160 -> 142
+  [OK]   ATAQUE suma poder (+15)
+  [OK]   Tras la respuesta enemiga vuelve el turno del jugador  -> PLAYER_TURN
+  [OK]   Turno avanza a 2
+  [OK]   Acción rechazada antes de empezar (estado INTRO)
+  [OK]   Acción desconocida rechazada
+  [OK]   Acción rechazada durante el turno enemigo
+  [OK]   PODER bloqueado sin recursos suficientes (30 < 50)
+  [OK]   PODER aceptado con 60 POW
+  [OK]   PODER consume 50 POW (más ganancias posteriores)
+  [OK]   PODER hace más daño que un ataque normal (>30)  -> daño=50
+  [OK]   DEFENSA reduce el daño recibido de forma observable  -> media atacando=18.2, defendiendo=6.4
+  [OK]   PARADA perfecta anula el daño  -> 135 -> 135
+  [OK]   PARADA perfecta contraataca
+  [OK]   PARADA perfecta da +30 POW
+  [OK]   PARADA fallida (tarde) recibe daño completo
+  [OK]   Tras fallar la parada el juego continúa  -> PLAYER_TURN
+  [OK]   PARADA fallida (pronto) recibe daño
+  [OK]   El enemigo actúa exactamente una vez por turno  -> acciones=5 turnos completados=5
+  [OK]   Sin transiciones de estado inválidas
+  sim smart        victorias= 92.2%  turnos medios= 7.5  máx=10  inválidas=0  sin terminar=0
+  sim attack_only  victorias= 85.8%  turnos medios= 6.6  máx=9  inválidas=0  sin terminar=0
+  sim random       victorias= 40.8%  turnos medios=10.0  máx=21  inválidas=0  sin terminar=0
+  sim passive      victorias=  0.0%  turnos medios=15.7  máx=20  inválidas=0  sin terminar=0
+  [OK]   Simulación: todos los combates terminan (sin bucles infinitos)
+  [OK]   Simulación: sin transiciones inválidas
+  [OK]   Equilibrio: jugando bien se gana casi siempre (>85%)  -> 0.9225
+  [OK]   Equilibrio: solo atacar es arriesgado (se puede perder)  -> 0.8575
+  [OK]   Equilibrio: defenderse siempre lleva a la derrota  -> 0.0
+  [OK]   Equilibrio: el combate no se resuelve en un golpe (>=4 turnos de media)  -> 7.4725
+  [OK]   Habilidades: el héroe usa Pluma Ígnea (fuego, pluma)
+  [OK]   Habilidades: el Pollo Negro usa Garra Sombría (sombra, onda)
+  [OK]   Habilidades: reglas intactas (coste 50, multiplicadores 2,4 y 2,9)
+  [OK]   Habilidades: el súper ataque del héroe pesa más que el del enemigo
+  [OK]   Opciones: la calidad Baja apaga efectos caros y Ultra los enciende
+  [OK]   Opciones: la vegetación llega más lejos en Ultra que en Baja
+  [OK]   Opciones: control de cantidad de partículas
+  [OK]   Opciones: las pruebas no escriben en el archivo de ajustes del jugador
+== Pruebas del estilo anime ==
+  [OK]   Shader anime compila y expone sus parámetros: anime_personaje.gdshader  -> faltan []
+  [OK]   Shader anime compila y expone sus parámetros: anime_contorno.gdshader  -> faltan []
+  [OK]   Shader anime compila y expone sus parámetros: anime_entorno.gdshader  -> faltan []
+  [OK]   Shader anime compila y expone sus parámetros: anime_follaje.gdshader  -> faltan []
+  [OK]   Shader anime compila y expone sus parámetros: anime_contorno_post.gdshader  -> faltan []
+  [OK]   Iluminación anime común con light() propia (bandas, sombra teñida, especular, borde)
+  [OK]   Recursos originales v13 intactos (shaders, GLB, materiales del mundo)  -> []
+  [OK]   Material de personaje: conserva textura y color y aplica el tinte de aldeano
+  [OK]   Material de personaje: el contorno va en next_pass (material_overlay queda libre para el daño)
+  [OK]   Material de personaje: el metal recibe un brillo estilizado más fuerte
+  [OK]   Material de personaje: los ojos no llevan contorno y tienen brillo propio
+  [OK]   Materiales separados por familia: personaje, entorno y follaje usan shaders distintos
+  [OK]   Máscaras de contorno: sólido < follaje < personaje
+  [OK]   PolloAmarillo: todas las superficies pasan a material anime
+  [OK]   PolloAmarillo: malla, esqueleto (21 huesos) y 11 animaciones intactos  -> { "huesos": 21, "tris": 109999, "anims": 11 } -> { "huesos": 21, "tris": 109999, "anims": 11 }
+  [OK]   PolloAmarillo: vuelve a sus materiales v13 sin pérdidas
+  [OK]   PolloNegro: todas las superficies pasan a material anime
+  [OK]   PolloNegro: malla, esqueleto (21 huesos) y 11 animaciones intactos  -> { "huesos": 21, "tris": 114995, "anims": 11 } -> { "huesos": 21, "tris": 114995, "anims": 11 }
+  [OK]   PolloNegro: vuelve a sus materiales v13 sin pérdidas
+  [OK]   Opciones: el estilo de fábrica sigue siendo el pictórico v13
+  [OK]   Opciones: selector de estilo anime y contornos
+  [OK]   El filtro pictórico se apaga en el estilo anime y vuelve en el v13
+  [OK]   Panel de Opciones: filas Estilo visual y Contornos sin perder las anteriores
+  [OK]   Panel de Opciones: el botón Estilo cambia el estilo
+== Pruebas del entorno anime (Etapa C) ==
+  [OK]   Shader anime del suelo compila y expone sus parámetros  -> ["sombra_color", "sombra_fuerza", "bandas", "umbral_sombra", "umbral_luz", "tono_medio", "suavizado", "intensidad_luz", "dureza_sombra", "especular_color", "especular_fuerza", "especular_tamano", "borde_color", "borde_fuerza", "borde_ancho", "translucidez", "saturacion", "detalle", "escala_ruido", "mascara_contorno"]
+  [OK]   Suelo: malla con color por vértice y normales hacia arriba  -> 864/864 hacia arriba
+  [OK]   Masa de copa: normales hacia fuera (se ve la cara exterior con cull_back)  -> 1.000
+  [OK]   Roca estilizada: normales hacia fuera y base apoyada en el suelo  -> min y -0.089
+  [OK]   Escena del entorno: suelo de selva montado
+  [OK]   Escena del entorno: bosque de fondo con árboles repartidos  -> 14
+  [OK]   Escena del entorno: el estilo anime tiene cielo propio y el v13 conserva el del ciclo
+  [OK]   Cielo anime al mediodía: azul saturado, no blanco lavado  -> (0.16, 0.48, 0.9, 1.0)
+  [OK]   Cielo anime de noche: más oscuro que al mediodía
+  [OK]   Entorno: el estilo v13 no usa las piezas nuevas del entorno
+== Pruebas del entorno anime, revisión C2 ==
+  [OK]   C2: shader de copa compila (racimos de hojas con corte alfa)  -> ["sombra_color", "sombra_fuerza", "bandas", "umbral_sombra", "umbral_luz", "tono_medio", "suavizado", "intensidad_luz", "dureza_sombra", "especular_color", "especular_fuerza", "especular_tamano", "borde_color", "borde_fuerza", "borde_ancho", "translucidez", "albedo_tex", "color_hoja", "color_luz", "variacion", "corte_alfa", "viento", "viento_vel", "mascara_contorno"]
+  [OK]   C2: shader de suelo compila (zonas de camino, musgo, hojarasca y hierba)  -> ["sombra_color", "sombra_fuerza", "bandas", "umbral_sombra", "umbral_luz", "tono_medio", "suavizado", "intensidad_luz", "dureza_sombra", "especular_color", "especular_fuerza", "especular_tamano", "borde_color", "borde_fuerza", "borde_ancho", "translucidez", "c_hierba", "c_hierba_clara", "c_hierba_seca", "c_musgo", "c_humedo", "c_hojarasca", "c_hojarasca_osc", "c_tierra", "c_tierra_oscura", "c_lejos", "camino", "camino_x0", "camino_z_fin", "arboles", "n_arboles", "lejos_inicio", "lejos_fin", "mascara_contorno"]
+  [OK]   C2: árbol ceiba con tronco y copa de racimos (2 superficies, 19 racimos)
+  [OK]   C2: árbol redonda con tronco y copa de racimos (2 superficies, 10 racimos)
+  [OK]   C2: árbol joven con tronco y copa de racimos (2 superficies, 6 racimos)
+  [OK]   C2: especies con alturas distintas (ceiba > joven y redonda)  -> { 0: 20.3589515686035, 1: 8.38947594165802, 2: 8.19272174835205 }
+  [OK]   C2: dos semillas dan árboles distintos (no son clones)
+  [OK]   C2: roca con normales hacia fuera  -> 240/240
+  [OK]   C2: roca facetada (caras planas, no un guijarro liso)  -> 79 caras planas
+  [OK]   C2: base de la roca hundida en el suelo  -> min y -0.10
+  [OK]   C2: escena sin esferas ni objetos de laboratorio
+  [OK]   C2: bosque con especies variadas  -> { "ceiba": 10, "redonda": 59, "joven": 48, "palma": 20, "lejano": 190 }
+  [OK]   C2: anillo lejano de bosque que cierra el horizonte  -> 190
+  [OK]   C2: horizonte sin franja azul (el horizonte del cielo tiende a la bruma)  -> (0.472, 0.611, 0.6585, 1.0)
+  [OK]   C2: el suelo del cielo y la niebla son el mismo color
+  [OK]   C2: cielo de mediodía azul con saturación contenida  -> (0.17, 0.4, 0.74, 1.0)
+  [OK]   C2: atardecer cálido sin teñir todo de rosa (verde del sol >= 0.7)  -> (1.0, 0.76, 0.58, 1.0)
+  [OK]   C2: noche legible (sol lunar y ambiente por encima de 0.3, más oscura que el día)
+  [OK]   C2: el estilo v13 muestra sus árboles y rocas originales y oculta los nuevos
+  [OK]   C2: el estilo anime vuelve a mostrar los nuevos
+== Laboratorio anime ==
+  [OK]   Laboratorio anime: esferas, madera, roca, follaje y los dos pollos montados  -> objetos=27
+  [OK]   Laboratorio anime: arranca en estilo anime con contorno de pantalla
+  [OK]   Laboratorio anime: Tab vuelve al estilo pictórico v13 (materiales y filtro originales)
+  [OK]   Laboratorio anime: la opción Contornos apaga todos los contornos (personajes, esferas y pantalla)
+  [OK]   Laboratorio anime: recorre horas, soles y encuadres sin errores
+== Ventana de parada (tiempo real) ==
+  [OK]   Parada: pulsar demasiado pronto falla (early)
+  [OK]   Parada: se resuelve una sola vez por ataque
+  [OK]   Parada: pulsar dentro de la ventana es perfecta
+  [OK]   Parada: no pulsar se resuelve como tarde (late) sin bloquear
+== Recorrido completo (extremo a extremo) ==
+  [OK]   Menú inicial cargado
+  [OK]   Menú tiene Jugar, Controles y Salir (sin Selva clásica)  -> ["Jugar", "Controles", "Opciones", "Laboratorio anime", "Salir", "‹  Ventana  ›", "‹  1600 × 900  ›", "‹  Sí  ›", "‹  Alta  ›", "‹  Normales  ›", "‹  Pictórico (v13)  ›"]
+  [OK]   Interfaz por encima del filtro pictórico: menú  -> []
+  [OK]   Botón Controles muestra el panel
+  [OK]   Menú tiene Opciones
+  [OK]   Botón Opciones muestra el panel (calidad, partículas, filtro)
+  [OK]   Opciones: cambiar la calidad desde el panel
+[Mundo3D] listo: { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 391 }
+  [OK]   Jugar carga el mundo 3D (Árbol del Eco)
+  [OK]   El Pollo Amarillo aparece
+[Mundo3D] listo: { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 390 }
+  [OK]   Con la ofrenda entregada la cortina del Guardián está abierta y el Pollo Negro espera
+  [OK]   El encuentro se activa al acercarse al Pollo Negro
+  [OK]   El movimiento se bloquea durante el encuentro
+  [OK]   Aparece el diálogo entre ambos pollos
+  [OK]   Pulsaciones rápidas no saltan el diálogo completo  -> índice 0 -> 1
+  [OK]   El encuentro no se duplica (llamadas repetidas ignoradas)
+  [OK]   El diálogo avanza y termina (5 líneas)  -> líneas mostradas=5
+  [OK]   Transición cinematográfica al combate
+  [OK]   Combate iniciado: turno del jugador
+  [OK]   Turno del jugador: aparece la mano de cartas
+  [OK]   HUD conectado a valores reales (HP)
+  [OK]   Combate en el claro de la Estatua del mundo 3D  -> (55.0, -0.3, 113.85)
+  [OK]   Turno del jugador: cámara sobre el hombro del héroe  -> hombro_heroe
+  [OK]   Cámara cerca del héroe (tercera persona, < 4 m de sus pies)  -> 3.51 m
+  [OK]   El héroe se ve en primer plano a un lado (sobre el hombro)  -> (471.4414, 801.2226)
+  [OK]   El enemigo se ve en el plano del hombro  -> (1030.562, 628.0878)
+  [OK]   Combate: filtro pictórico activo
+  [OK]   Interfaz por encima del filtro pictórico: combate  -> []
+  [OK]   El filtro pictórico se puede desactivar y volver a activar
+    renderizador: forward_plus
+  [OK]   Ataque: corte al plano de impacto  -> impacto
+  [OK]   Fuera del turno del jugador no hay cartas ni botones
+  [OK]   ATAQUE: daño real al enemigo  -> 160 -> 143
+  [OK]   Pulsaciones repetidas no duplican el daño (1 golpe del jugador)
+  [OK]   DEFENSA activa la guardia (DEF sube a 16)
+  [OK]   DEFENSA: el daño recibido se reduce  -> daño=7
+  [OK]   Ataque enemigo: plano a la espalda del enemigo  -> hombro_enemigo
+  [OK]   PARADA acertada: sin daño y con contraataque  -> perfect hp 107->107
+  [OK]   PARADA fallida: resultado distinto (recibe daño)  -> early hp 107->88
+  [OK]   Botón PODER habilitado con POW suficiente
+  [OK]   PODER consume 50 POW  -> 100 -> 50
+  [OK]   Súper ataque: cinemática en marcha (sin HUD, con franjas de cine)
+  [OK]   PODER causa daño elevado  -> daño=48
+  [OK]   Habilidad del héroe definida por datos (Pluma Ígnea)
+  [OK]   Súper ataque: pasa por activación, vuelta, ojos, espalda y rival  -> ["activacion_a", "activacion_b", "vuelta_a", "vuelta_b", "ojos", "ojos_cerca", "espalda", "lateral", "rival"]
+  [OK]   Súper ataque: al terminar vuelve el HUD y la velocidad normal
+  [OK]   Habilidad cinematográfica: el daño se aplica una sola vez  -> eventos=1
+  [OK]   PODER bloqueado sin POW suficiente (botón deshabilitado y acción rechazada)
+  [OK]   Garra Sombría: cinemática del enemigo en marcha (sin ventana de parada aún)
+  [OK]   Garra Sombría: la ventana de parada se abre tras el preludio, con el HUD visible
+  [OK]   Garra Sombría parada: sin daño, contraataque y un solo evento de daño  -> perfect hp 135->135 eventos=1
+  [OK]   Garra Sombría: termina sin bloquear (HUD, velocidad normal, turno del jugador)
+  [OK]   Garra Sombría recibida en guardia: un solo evento de daño  -> hp 135->105 eventos=1
+  [OK]   Habilidad del enemigo definida por datos (Garra Sombría, elemento sombra)
+  [OK]   Esc pausa el combate
+  [OK]   Esc reanuda
+  [OK]   Pantalla de VICTORIA al vaciar el HP enemigo
+  [OK]   Máquina de estados sin transiciones inválidas
+[Mundo3D] listo: { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 400 }
+  [OK]   Continuar regresa a la exploración
+  [OK]   El jugador reaparece en el claro  -> 4.2 m del enemigo
+  [OK]   Diálogo tras la victoria
+  [OK]   El encuentro no se repite automáticamente
+  [OK]   Aparece la opción de revancha (E)
+  [OK]   La revancha inicia el encuentro de nuevo (ciclo repetible)
+  [OK]   Segundo combate cargado sin reiniciar el proyecto
+  [OK]   Combate iniciado: turno del jugador
+  [OK]   Turno del jugador: aparece la mano de cartas
+  [OK]   HUD conectado a valores reales (HP)
+  [OK]   Pantalla de DERROTA al vaciar el HP del protagonista
+  [OK]   Máquina de estados sin transiciones inválidas
+  [OK]   Reintentar recarga el combate
+  [OK]   Reintentar restaura HP/POW y estados
+  [OK]   Reinicios consecutivos sin estados colgados
+  [OK]   Volver al menú desde la pausa
+== Mundo 3D: Árbol del Eco -> Aldea Baja -> Cenote Azul -> Camino Secreto -> Estatua ==
+[Mundo3D] listo: { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 372 }
+  [OK]   Jugar carga el mundo 3D
+  [OK]   Mundo 3D construido (geometría, vegetación instanciada, colisiones, luces)  -> { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 372 }
+  [OK]   Controles táctiles presentes (joystick, RUN, USAR)
+  [OK]   Nido: diálogo de despertar
+  [OK]   Cámara al hombro: nido  -> hombro 1.64 m
+  [OK]   Personaje dentro del encuadre: interior del nido  -> pantalla=(731, 972)
+  [OK]   Nido: control restaurado  -> modo=0 entrada=true dlg=false ["Mmm… El nido cruje como un tam", "Hoy es el día: bajaré del Árbo", "Primero, salir por la puerta r"]
+  [OK]   Recorrido a pie: hasta la ventana del nido  -> punto 1/1 en (24.6, 12.0, -39.2), 0.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-0.17, 0.0, 2.29))
+  [OK]   Interacción: ventana del nido (aviso + diálogo)  -> aviso=true actual=ventana
+  [OK]   Recorrido a pie: salir por la puerta redonda  -> punto 3/3 en (18.7, 12.1, -40.0), 5.0 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-1.12, 0.0, -0.02))
+  [OK]   Cámara al hombro: rama madre  -> hombro 3.26 m
+  [OK]   Personaje dentro del encuadre: rama madre  -> pantalla=(826, 771)
+  [OK]   Cámara al hombro: se gira a mano  -> 2.46 -> 3.74
+  [OK]   Personaje dentro del encuadre: tras girar la cámara  -> pantalla=(824, 775)
+  [OK]   Cámara quieta con el joystick suelto (rama madre y anillo)  -> 7 puntos, máx 0.000 rad en 
+  [OK]   Rama: zona estrecha detectada (equilibrio)  -> 0.91
+  [OK]   Rama: más lento haciendo equilibrio  -> 0.22 m/s
+  [OK]   Rama: no se cae  -> (10.25415, 12.07565, -40.20401)
+  [OK]   Límites: no se puede saltar al vacío desde la rama
+  [OK]   Recorrido a pie: anillo alrededor del tronco  -> punto 7/7 en (0.6, 12.0, -30.4), 7.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-2.25, 0.0, 0.49))
+  [OK]   Personaje dentro del encuadre: anillo del tronco  -> pantalla=(1032, 745)
+  [OK]   Recorrido a pie: puente de yute (primera mitad)  -> punto 2/2 en (-0.9, 10.7, -19.7), 9.2 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-0.15, 0.0, 1.28))
+  [OK]   Cámara al hombro: puente de yute  -> hombro 3.36 m
+  [OK]   Puente de yute: modo equilibrio  -> 0.75
+  [OK]   Personaje dentro del encuadre: puente de yute  -> pantalla=(851, 760)
+  [OK]   Recorrido a pie: puente de yute hasta el mirador
+  [OK]   Mirador: empieza la revelación (cámara de grúa)
+  [OK]   Mirador: la grúa termina con el diálogo
+  [OK]   Mirador: control restaurado y cámara de zona
+  [OK]   Recorrido a pie: escalera de la ceiba (mitad norte)  -> punto 9/9 en (2.1, 5.6, -8.2), 8.0 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(1.43, 0.0, 1.8))
+  [OK]   Personaje dentro del encuadre: escalera  -> pantalla=(858, 773)
+  [OK]   Recorrido a pie: escalera de la ceiba hasta el suelo  -> punto 7/7 en (-3.9, 0.4, -1.7), 5.1 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-2.2, 0.0, -0.65))
+  [OK]   Escalera: llega al suelo de la aldea  -> (-3.915635, 0.355744, -1.687078)
+  [OK]   Recorrido a pie: camino de las raíces  -> punto 3/3 en (-9.8, 0.2, -12.9), 3.1 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-1.54, 0.0, -4.12))
+  [OK]   Interacción: pollitos entre las raíces (aviso + diálogo)  -> aviso=true actual=ninos
+  [OK]   Recorrido a pie: bajar a la plaza y al mercado  -> punto 6/6 en (9.5, 0.0, 13.2), 8.5 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(3.63, 0.0, 2.49))
+  [OK]   Aldea: título de zona y objetivo
+  [OK]   Personaje dentro del encuadre: mercado  -> pantalla=(849, 739)
+  [OK]   Interacción: Doña Cresta (mercado) (aviso + diálogo)  -> aviso=true actual=mercader
+  [OK]   Doña Cresta entrega la ofrenda de maíz
+  [OK]   Recorrido a pie: hasta el Abuelo Espolón  -> punto 2/2 en (-5.4, 0.0, 18.4), 4.4 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-4.4, 0.0, -0.03))
+  [OK]   Interacción: Abuelo Espolón (aviso + diálogo)  -> aviso=true actual=anciano
+  [OK]   Recorrido a pie: hasta la piedra de glifos  -> punto 1/1 en (-7.5, 0.0, 13.2), 2.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-0.48, 0.0, -2.25))
+  [OK]   Interacción: piedra de glifos (aviso + diálogo)  -> aviso=true actual=piedra
+  [OK]   Recorrido a pie: hasta el pozo tejido  -> punto 2/2 en (-0.6, 0.0, 11.0), 3.5 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(2.29, 0.0, 0.16))
+  [OK]   Interacción: pozo tejido (aviso + diálogo)  -> aviso=true actual=pozo
+  [OK]   Plaza: el joystick mueve en las 4 direcciones  -> [1.28, 1.61, 1.63, 2.1]
+  [OK]   Pausa en la exploración 3D
+  [OK]   Reanudar la exploración
+  [OK]   Interfaz por encima del filtro pictórico: mundo 3D  -> []
+  [OK]   Recorrido a pie: camino de piedra al Cenote Azul  -> punto 4/4 en (21.9, -0.2, 6.0), 6.1 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(4.22, 0.0, -1.25))
+  [OK]   Recorrido a pie: sendero al altar del Guajolote (bajo la raíz)  -> punto 4/4 en (30.0, 0.2, 20.7), 7.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(1.06, 0.0, 2.04))
+  [OK]   Interacción: altar al Guajolote (aviso + diálogo)  -> aviso=true actual=altar
+  [OK]   Recorrido a pie: hasta la entrada del puente de piedra  -> punto 6/6 en (41.5, 0.2, 9.900001), 8.7 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(3.87, 0.0, 2.09))
+  [OK]   Borde del cenote junto al puente: el personaje no cae al empujar hacia los huecos  -> y mínima=0.17
+  [OK]   Si cae fuera de la zona caminable, vuelve solo al último punto seguro  -> (41.68, 0.53, 11.06)
+  [OK]   Tras volver puede seguir moviéndose  -> (41.35, 0.23, 10.86)
+  [OK]   Recorrido a pie: hasta el puente de piedra  -> punto 3/3 en (44.0, 0.5, 21.4), 4.7 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(0.22, 0.0, 4.39))
+  [OK]   Cámara al hombro: puente del cenote  -> hombro 3.28 m
+  [OK]   Personaje dentro del encuadre: puente del cenote  -> pantalla=(827, 769)
+  [OK]   Cascadas del Cenote Azul: mayor y menor con arroyo, bruma y sonido 3D
+  [OK]   Vida ambiental alrededor del jugador (hojas que caen, motas de luz)
+  [OK]   Interacción: contemplar la cascada desde el puente (aviso + diálogo)  -> aviso=true actual=cascada
+  [OK]   Cascada: la cámara vuelve y el jugador recupera el control
+  [OK]   Recorrido a pie: cruzar el puente hasta la orquídea  -> punto 4/4 en (46.4, 0.2, 40.8), 5.8 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(2.61, 0.0, 1.46))
+  [OK]   Recorrido a pie: túnel de lianas (primer tramo)  -> punto 4/4 en (50.4, -0.1, 66.3), 6.4 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(0.99, 0.0, 4.29))
+  [OK]   Personaje dentro del encuadre: túnel  -> pantalla=(860, 715)
+  [OK]   Recorrido a pie: túnel hasta el Guardián  -> punto 3/3 en (53.6, 0.1, 86.2), 4.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(0.19, 0.0, 4.4))
+  [OK]   La cortina de lianas cierra el paso antes de la ofrenda  -> (53.81985, 0.069441, 89.29923)
+  [OK]   Recorrido a pie: ante el Guardián  -> punto 1/1 en (53.6, 0.1, 87.7), 1.1 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(-0.1, 0.0, -2.3))
+  [OK]   Interacción: Guardián del Camino Secreto (aviso + diálogo)  -> aviso=true actual=guardian
+  [OK]   El Guardián acepta la ofrenda y la cortina se abre
+  [OK]   Recorrido a pie: salir del túnel al claro de la Estatua  -> punto 4/4 en (55.0, -0.3, 103.4), 4.6 s (modo=0 entrada=true auto=(inf, inf, inf) vel=(0.1, 0.0, 4.4))
+  [OK]   Cámara al hombro: claro de la estatua  -> hombro 3.30 m
+  [OK]   Personaje dentro del encuadre: claro de la estatua  -> pantalla=(831, 765)
+  [OK]   Acercarse al Pollo Negro inicia el encuentro
+  [OK]   Diálogo del encuentro
+  [INFO] planos de cámara vistos: ["hombro"]
+  [INFO] fotogramas con el personaje fuera de cuadro: 4
+  [OK]   Cámara al hombro durante todo el recorrido (sin planos lejanos)  -> ["hombro"]
+  [OK]   El personaje casi nunca queda fuera de cuadro (< 3 % de los fotogramas caminando)  -> 4 fotogramas
+  [OK]   Transición al combate
+  [OK]   Combate iniciado: turno del jugador
+  [OK]   Turno del jugador: aparece la mano de cartas
+  [OK]   HUD conectado a valores reales (HP)
+  [OK]   Combate en el claro de la Estatua del mundo 3D  -> (55.0, -0.3, 113.85)
+  [OK]   Turno del jugador: cámara sobre el hombro del héroe  -> hombro_heroe
+  [OK]   Cámara cerca del héroe (tercera persona, < 4 m de sus pies)  -> 3.51 m
+  [OK]   El héroe se ve en primer plano a un lado (sobre el hombro)  -> (471.4414, 801.2226)
+  [OK]   El enemigo se ve en el plano del hombro  -> (1030.562, 628.0878)
+  [OK]   Combate: filtro pictórico activo
+  [OK]   Interfaz por encima del filtro pictórico: combate  -> []
+  [OK]   El filtro pictórico se puede desactivar y volver a activar
+    renderizador: forward_plus
+  [OK]   Ataque: corte al plano de impacto  -> impacto
+  [OK]   Fuera del turno del jugador no hay cartas ni botones
+  [OK]   ATAQUE: daño real al enemigo  -> 160 -> 141
+  [OK]   Pulsaciones repetidas no duplican el daño (1 golpe del jugador)
+  [OK]   DEFENSA activa la guardia (DEF sube a 16)
+  [OK]   DEFENSA: el daño recibido se reduce  -> daño=6
+  [OK]   Ataque enemigo: plano a la espalda del enemigo  -> hombro_enemigo
+  [OK]   PARADA acertada: sin daño y con contraataque  -> perfect hp 110->110
+  [OK]   PARADA fallida: resultado distinto (recibe daño)  -> early hp 110->94
+  [OK]   Botón PODER habilitado con POW suficiente
+  [OK]   PODER consume 50 POW  -> 100 -> 50
+  [OK]   Súper ataque: cinemática en marcha (sin HUD, con franjas de cine)
+  [OK]   PODER causa daño elevado  -> daño=45
+  [OK]   Habilidad del héroe definida por datos (Pluma Ígnea)
+  [OK]   Súper ataque: pasa por activación, vuelta, ojos, espalda y rival  -> ["activacion_a", "activacion_b", "vuelta_a", "vuelta_b", "ojos", "ojos_cerca", "espalda", "lateral", "rival"]
+  [OK]   Súper ataque: al terminar vuelve el HUD y la velocidad normal
+  [OK]   Habilidad cinematográfica: el daño se aplica una sola vez  -> eventos=1
+  [OK]   PODER bloqueado sin POW suficiente (botón deshabilitado y acción rechazada)
+  [OK]   Garra Sombría: cinemática del enemigo en marcha (sin ventana de parada aún)
+  [OK]   Garra Sombría: la ventana de parada se abre tras el preludio, con el HUD visible
+  [OK]   Garra Sombría parada: sin daño, contraataque y un solo evento de daño  -> perfect hp 135->135 eventos=1
+  [OK]   Garra Sombría: termina sin bloquear (HUD, velocidad normal, turno del jugador)
+  [OK]   Garra Sombría recibida en guardia: un solo evento de daño  -> hp 135->110 eventos=1
+  [OK]   Habilidad del enemigo definida por datos (Garra Sombría, elemento sombra)
+  [OK]   Esc pausa el combate
+  [OK]   Esc reanuda
+  [OK]   Pantalla de VICTORIA al vaciar el HP enemigo
+  [OK]   Máquina de estados sin transiciones inválidas
+[Mundo3D] listo: { "mallas": 24, "triangulos": 484026, "biblioteca": 91, "instancias": 12837, "colisiones": 315, "luces": 91, "ms": 372 }
+  [OK]   Tras la victoria se vuelve al mundo 3D
+  [OK]   Diálogo tras la victoria
+  [OK]   Reaparece en el claro con la opción de revancha  -> revancha
+  [OK]   Volver al menú
+
+==== RESULTADO: 296 correctas, 0 fallidas ====

@@ -27,6 +27,8 @@ func _run_suite() -> void:
 		all += a.run_all(get_tree())
 		var en = preload("res://tests/entorno_anime_tests.gd").new()
 		all += en.run_all(get_tree())
+		var c2 = preload("res://tests/entorno_c2_tests.gd").new()
+		all += c2.run_all(get_tree())
 		await run_laboratorio_anime()
 	if mode in ["all", "parry", "e2e"]:
 		await run_parry_window_tests()
