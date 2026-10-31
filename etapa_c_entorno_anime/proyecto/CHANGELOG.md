@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## Etapa C anime, validación y pulido de la C3 (2026-10-30)
+
+Sobre la misma escena C3 (sin escenas, scripts ni carpetas nuevas). Validada con Godot 4.7.2.
+
+- Recorrido con el personaje: tecla C (o `--jugar`) en `PruebaEntornoAnimeC3.tscn` usa el
+  `PlayerCinematic.tscn` del juego y el `DirectorCamaras` con el plano "hombro" de `PlanosMundo`, sin
+  modificarlos. `--recorrido` con `--write-movie` graba el video de validación.
+- Colisiones (capa 1): corteza de los árboles, raíces, rocas medianas y grandes, tronco caído, tallos de
+  palmas, helechos arborescentes y plataneras, y suelo. Antes la C3 no tenía colisiones.
+- Pulido: troncos de ceiba, higuera y cecropia más oscuros y cálidos; sin copas anchas a menos de 7,5 m
+  del camino; árbol en pisos apartado del camino; raíces que llegan a las rocas; roderas a tramos,
+  piedrecillas agrupadas, hojas caídas bajo las copas y en la orilla del camino, charcos más suaves;
+  relleno frío nocturno sobre el personaje.
+- `tests/entorno_c3_tests.gd`: 14 pruebas nuevas de recorrido (caminar, correr, girar, choques, paseos
+  fuera del camino, cámara) y de la luz nocturna del personaje. `tests/e2e_director.gd`: modo `c3`.
+
 ## Etapa C anime, revisión C3: selva refinada (2026-10-30)
 
 Escena nueva y aislada `scenes/pruebas/PruebaEntornoAnimeC3.tscn`, construida sobre la C2 (que no

@@ -2,6 +2,23 @@
 
 Las rutas de `proyecto/` son las mismas que dentro del proyecto Godot (`res://`).
 
+## Validación y pulido de la C3
+
+### Modificados (ningún archivo nuevo en el proyecto)
+| Archivo | Cambio |
+|---|---|
+| `proyecto/scripts/anime/prueba_entorno_c3.gd` | Recorrido con el personaje y la cámara del juego, colisiones, piloto de pruebas, video `--recorrido`, luz nocturna sobre el personaje, pulido de copas, troncos y raíces |
+| `proyecto/assets/materials/anime/anime_suelo_selva_c3.gdshader` | Roderas a tramos, piedrecillas agrupadas, hojas caídas, charcos más suaves |
+| `proyecto/tests/entorno_c3_tests.gd` | 14 pruebas nuevas (35 en total) |
+| `proyecto/tests/e2e_director.gd` | Espera las pruebas C3 y añade el modo `c3` |
+| `proyecto/CHANGELOG.md` | Entrada de la validación |
+
+### Añadidos en la carpeta de entrega (dentro de las carpetas C3 existentes)
+- `PUNTO_CONTROL_C3.md`: cómo volver al estado de la C3 entregada.
+- `capturas_c3/validacion/`: 17 capturas después del pulido, mismos encuadres y horas.
+- `comparaciones_c3/antes_despues/`: 17 láminas antes | después.
+- `pruebas_c3/validacion/`: video del recorrido (`recorrido_c3.mp4`), hoja de fotogramas, 331 pruebas, medición comparativa y consola del video.
+
 ## Revisión C3
 
 ### Nuevos en la C3

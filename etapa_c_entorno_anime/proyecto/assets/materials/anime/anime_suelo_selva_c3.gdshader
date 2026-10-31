@@ -2,6 +2,9 @@
 // Novedades C3: tierra húmeda y musgo al pie de las rocas, piedrecillas y roderas en el camino,
 // orilla del camino con mechones de hierba, franja de musgo entre hojarasca y hierba, y un leve
 // brillo de luna en el camino de noche ('luna'), sin subir la exposición general.
+// Pulido de la C3: roderas a tramos, con separación y ancho que cambian; piedrecillas agrupadas en
+// dos tamaños y más abundantes hacia la orilla; hojas caídas que se juntan bajo las copas y entran
+// un poco en el camino; charcos de humedad más suaves.
 // Zonas con borde limpio en lugar de manchas difuminadas:
 // - camino de tierra con borde irregular y dos tonos;
 // - franja de hojarasca junto al camino y bajo los árboles;
@@ -84,7 +87,7 @@ void fragment() {
 	// musgo bajo las copas, con charcos de humedad dentro
 	float hum = smoothstep(0.42, 0.46, bajo_copa + roto);
 	col = mix(col, c_musgo, hum);
-	col = mix(col, c_humedo, smoothstep(0.64, 0.67, vnoise(p * 0.16 + 13.0) + roto * 0.3) * hum);
+	col = mix(col, c_humedo, smoothstep(0.66, 0.7, vnoise(p * 0.16 + 13.0) + roto * 0.3) * hum * 0.7);
 	// hojarasca: orilla del camino y manchas irregulares al pie de los árboles, con hojas sueltas
 	float hoj = max(m_orilla, smoothstep(0.66, 0.69, bajo_copa * 0.7 + vnoise(p * 0.5 + 5.0) * 0.32 + roto * 0.5));
 	float hojas = smoothstep(0.55, 0.6, vnoise(p * 3.2 + 40.0)) * (1.0 - smoothstep(10.0, 30.0, dist));
@@ -101,17 +104,30 @@ void fragment() {
 	}
 	col = mix(col, c_musgo * 0.95, smoothstep(0.15, 0.2, pie) * 0.85);
 	col = mix(col, c_humedo * 0.85, smoothstep(0.55, 0.6, pie));
-	// hojas caídas sueltas sobre el musgo
-	col = mix(col, c_hojarasca, hum * (1.0 - hoj) * smoothstep(0.72, 0.75, vnoise(p * 2.6 + 50.0)) * (1.0 - smoothstep(8.0, 22.0, dist)));
+	// hojas caídas sueltas sobre el musgo: más juntas bajo las copas, en dos tonos
+	float caidas = smoothstep(0.79 - bajo_copa * 0.14, 0.82 - bajo_copa * 0.14, vnoise(p * 2.6 + 50.0)) * smoothstep(0.3, 0.6, vnoise(p * 0.45 + 70.0) + bajo_copa * 0.4);
+	col = mix(col, mix(c_hojarasca, c_hojarasca_osc * 1.1, step(0.5, vnoise(p * 7.0 + 11.0))), hum * (1.0 - hoj) * caidas * (1.0 - smoothstep(8.0, 22.0, dist)));
 	// tierra del camino en dos tonos
 	vec3 tierra = mix(c_tierra, c_tierra_oscura, smoothstep(0.55, 0.6, vnoise(p * 0.4 + 3.0)) * 0.7);
-	// roderas: dos franjas más oscuras y compactas a lo largo del camino
+	// roderas: franjas más oscuras y compactas, a tramos y distintas en cada lado (separación y ancho
+	// cambian a lo largo del camino), para que no se lean como un patrón repetido
 	float dx = p.x - camino_x(p.y);
-	float rodera = (1.0 - smoothstep(0.12, 0.2, abs(abs(dx) - 0.5 + (vnoise(p * 0.8) - 0.5) * 0.2)));
-	tierra = mix(tierra, c_tierra_oscura * 0.9, rodera * 0.55);
-	// piedrecillas cerca de la cámara
-	float piedras = smoothstep(0.84, 0.86, vnoise(p * 11.0 + 60.0)) * (1.0 - smoothstep(5.0, 14.0, dist));
-	tierra = mix(tierra, c_piedra * 0.8, piedras * 0.6);
+	float lado = step(0.0, dx);
+	float sep = 0.5 + (vnoise(vec2(p.y * 0.07, 3.0 + lado * 5.0)) - 0.5) * 0.45;
+	float ancho = mix(0.07, 0.19, vnoise(vec2(p.y * 0.21, 9.0 + lado * 4.0)));
+	float tramo = smoothstep(0.32, 0.5, vnoise(vec2(p.y * 0.16, 17.0 + lado * 6.0)));
+	float rodera = (1.0 - smoothstep(ancho, ancho + 0.09, abs(abs(dx) - sep + (vnoise(p * 0.8) - 0.5) * 0.24))) * tramo;
+	tierra = mix(tierra, c_tierra_oscura * 0.9, rodera * 0.5);
+	// piedrecillas cerca de la cámara: en grupos, en dos tamaños y más hacia la orilla
+	float grupo = smoothstep(0.42, 0.7, vnoise(p * 0.6 + 80.0) + smoothstep(0.4, 1.2, abs(dx)) * 0.25);
+	float chicas = smoothstep(0.8, 0.83, vnoise(p * 11.0 + 60.0));
+	float grandes = smoothstep(0.86, 0.885, vnoise(p * 5.5 + 90.0));
+	float piedras = max(chicas, grandes) * grupo * (1.0 - smoothstep(5.0, 14.0, dist));
+	vec3 tono_piedra = mix(c_piedra * 0.68, c_piedra * 0.92, vnoise(p * 3.0 + 33.0));
+	tierra = mix(tierra, tono_piedra, piedras * 0.65);
+	// hojas que caen de las orillas al camino
+	float al_camino = smoothstep(0.66, 0.7, vnoise(p * 3.0 + 120.0)) * smoothstep(0.55, 1.15, abs(dx)) * (1.0 - smoothstep(8.0, 22.0, dist));
+	tierra = mix(tierra, c_hojarasca_osc, al_camino * 0.75);
 	// luz de luna: el camino conserva algo de valor de noche para poder orientarse
 	tierra *= 1.0 + luna * 0.35;
 	col = mix(col, tierra, m_camino);

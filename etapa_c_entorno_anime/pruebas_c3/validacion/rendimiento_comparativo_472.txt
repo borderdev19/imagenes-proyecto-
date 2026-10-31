@@ -1,0 +1,5 @@
+Medición comparativa C3 (Godot 4.7.2, Forward+, lavapipe en CPU, 1920x1080, encuadre general, 20 fotogramas).
+No representa una GPU real.
+
+Antes (bf3569a): dibujos=765 triangulos=1348843 ms=5170.52
+Después:         dibujos=765 triangulos=1392171 ms=5293.25

@@ -30,8 +30,11 @@ func _run_suite() -> void:
 		var c2 = preload("res://tests/entorno_c2_tests.gd").new()
 		all += c2.run_all(get_tree())
 		var c3 = preload("res://tests/entorno_c3_tests.gd").new()
-		all += c3.run_all(get_tree())
+		all += await c3.run_all(get_tree())
 		await run_laboratorio_anime()
+	if mode == "c3":
+		# solo el entorno C3 con el recorrido del personaje (iteración rápida)
+		all += await preload("res://tests/entorno_c3_tests.gd").new().run_all(get_tree())
 	if mode in ["all", "parry", "e2e"]:
 		await run_parry_window_tests()
 	if mode in ["all", "e2e"]:

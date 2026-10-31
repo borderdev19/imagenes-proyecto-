@@ -1,11 +1,95 @@
 # Etapa C · Entorno selvático anime: informe técnico
 
 **Fecha:** 30 de octubre de 2026
-**Estado:** revisión C3 terminada y en espera de tu revisión. No está integrada en el mundo principal y no he empezado otra etapa.
+**Estado:** C3 validada con el personaje en movimiento y pulida, en espera de tu revisión. No está integrada en `main` ni en el mundo principal, y no he empezado otra etapa.
 
-El informe tiene tres partes, de la más reciente a la más antigua: **C3**, **C2** y **C1**. Las capturas de C1 y C2 se conservan sin cambios.
+El informe tiene cuatro partes, de la más reciente a la más antigua: **validación y pulido de la C3**, **C3**, **C2** y **C1**. Las capturas de C1, C2 y de la entrega C3 se conservan sin cambios.
 
 ---
+
+## Validación y pulido de la C3
+
+**Rama:** `etapa-b-cel-shading-anime` (nada en `main`). **Punto de control** antes de cambiar nada: commit `05dc880` (C3 tal como se entregó en `bf3569a`, ver `PUNTO_CONTROL_C3.md`).
+
+El trabajo se hizo **sobre la misma escena y los mismos archivos de la C3**. No hay escenas, scripts, materiales ni carpetas de una C4. La C2, la C1 y sus comparaciones siguen igual.
+
+### V.1 Cómo se probó con el personaje en movimiento
+- La escena C3 tiene ahora un **modo de recorrido** (tecla **C**, o `--jugar` al abrirla). Usa las piezas del juego **tal cual**, sin modificarlas:
+  - el Pollo Amarillo jugable `scenes/characters/PlayerCinematic.tscn` (`CinematicPlayer`: caminar 2,3 m/s, correr 4,4 m/s, escalón 0,32 m, giro del cuerpo antes de avanzar);
+  - la cámara al hombro del mundo: `DirectorCamaras` con el plano `"hombro"` de `PlanosMundo.build()` (distancia 3,2 m, giro a mano con Q/R, ratón o stick, inclinación con I/K, choque con la capa 1).
+- La escena solo hace lo mismo que `Mundo3D`: le da al personaje la zona caminable y, cada fotograma, la base de la cámara.
+- Las pruebas y el video conducen al personaje con un **piloto que pulsa las mismas acciones del jugador** (`move_*` relativas a la cámara, `run`, `cam_*`). No hay atajos dentro del controlador.
+
+### V.2 Problemas de colisión y navegación encontrados, y su solución
+| # | Problema | Cómo se vio | Solución |
+|---|---|---|---|
+| 1 | **La C3 no tenía ninguna colisión** (era una escena de capturas). El personaje atravesaba troncos, raíces y rocas, y la cámara no chocaba con nada. | Con las colisiones desactivadas, el personaje llega al **centro** del grupo de rocas, del tronco inclinado, del árbol monumental y del tronco caído (0,34 m: el punto al que se le manda). | Colisión en la capa 1 (la que usan el personaje y la cámara): corteza de cada árbol con su propia malla (tronco, raíces del pie y ramas), raíces del camino, rocas medianas y grandes, tronco caído, tallos de palmas, helechos arborescentes y plataneras, y el suelo. En total, 266 formas (133 árboles, 54 rocas, las raíces, el tronco caído y los tallos), más el suelo. |
+| 2 | Las piedrecillas y raíces bajas podían frenar el paso por el camino. | — | Las piedrecillas no tienen colisión. Las raíces bajas se suben como escalones (escalón del juego, 0,32 m). El recorrido entero no tiene ni un atasco. |
+| 3 | Las monsteras, arbustos, helechos e hierbas bloquearían el paso si fueran sólidos. | — | Se atraviesan, como vegetación blanda. |
+| 4 | **Al hundir más las rocas** (prueba de pulido), la roca grande quedó con pendientes de menos de 50° y el personaje **se subía encima** (1 m de altura). | Prueba de choques: llegaba a 0,35 m del centro de la roca, a 0,95 m de altura. | Descartado: las rocas vuelven a su profundidad original. |
+| 5 | Las raíces nuevas hacia las rocas hacían de **escalera** para subirse a ellas. | Igual que el 4, en una primera versión. | Raíces bajas (0,30-0,42 m) y separadas de la roca al menos 0,6 m. |
+| 6 | Fuera del camino, el tallo de una platanera o sus hojas se ponen a veces entre la cámara y el personaje. | Entre el 1 y el 5 % de las muestras de cámara en los paseos fuera del camino, según la ejecución; 0 % en el camino. | Se deja así (es breve y fuera del camino). Ver pendientes: depende del director de cámaras, que es un sistema original. |
+
+### V.3 Resultado del recorrido (pruebas automáticas, Godot 4.7.2)
+- **Camino entero (96 m)**: 32 m caminando y 64 m corriendo, de z = 10 a z = −86. Llega al final, **0 atascos, 0 rescates**. Velocidad medida: **2,30 m/s** caminando y **4,40 m/s** corriendo (las del juego).
+- **Giro**: media vuelta de **171°** en 1 s, girando el cuerpo antes de avanzar.
+- **Choques** (caminar directamente contra el obstáculo durante 5 s): se detiene a **1,38 m** del centro del grupo de rocas, **0,99 m** del tronco inclinado, **1,52 m** del árbol monumental y **0,65 m** del tronco caído. **0 fotogramas** con el cuerpo dentro de un obstáculo.
+- **24 paseos fuera del camino**, a 4-12 m del eje, entre raíces, rocas y troncos, y vuelta al camino: 0 fotogramas dentro de obstáculos, 0 veces atrapado, 0 rescates.
+- **Cámara al hombro en el camino**, 295 muestras: 0 dentro de troncos, rocas o el suelo; **0 con la vista tapada** por troncos, ramas, copas o plantas; 0 pegada al personaje (menos de 1 m). La comprobación de hojas usa los triángulos reales de las copas, y la prueba verifica que detecta una copa cuando la hay.
+- **Cámara fuera del camino**, 2 172 muestras en la ejecución final: 0 dentro de obstáculos; vista tapada en el **1,3 %** (28 muestras, sobre todo plataneras). En ejecuciones anteriores llegó al 5 %.
+- **Giro manual de la cámara** con el personaje quieto, en 3 sitios del camino: 277° a la izquierda y a la derecha, e inclinación arriba y abajo. 0 fotogramas dentro de obstáculos.
+- **Escala:** personaje de 1,45 m, camino de unos 2,6 m de ancho y árbol monumental de 33 m (más de 22 veces la altura del personaje).
+
+### V.4 Pulido visual (sin perjudicar la navegación)
+Todos los cambios se comprobaron de nuevo con el recorrido.
+- **Copas:** a menos de 7,5 m del camino ya no crecen especies de copa ancha (redonda, en pisos, ceiba). En su lugar van cecropias y árboles jóvenes, de copa alta y estrecha, con una escala máxima de 1,0. El árbol en pisos fijo junto al camino se apartó 3 m: su copa de 6 m lo cubría entero. Se ve más cielo sobre el camino y la mitad superior de la imagen queda menos saturada. El bosque mantiene sus 8 tipos de árbol y su densidad.
+- **Troncos claros:** ceiba, higuera monumental y cecropia más oscuras y cálidas, y con algo más de musgo. Ya no se leen como troncos blancos o grises.
+- **Roderas:** van a tramos, con separación y ancho que cambian a lo largo del camino y son distintas en cada lado. Antes eran dos líneas paralelas idénticas.
+- **Piedrecillas:** en grupos, en dos tamaños, con tono variable y más abundantes hacia la orilla. Antes eran un moteado uniforme.
+- **Hojas y musgo:** las hojas caídas se juntan bajo las copas, en dos tonos, y algunas entran desde la orilla al camino. Los charcos de humedad son más suaves.
+- **Rocas integradas:** los grupos grandes tienen raíces del árbol más cercano que llegan a la roca y la rodean (72 raíces, antes 56), además del anillo de musgo y tierra húmeda.
+- **Noche:** se mantienen la atmósfera azul, la luna, las 220 luciérnagas y la misma exposición que de día. Se añade un **relleno frío y suave sobre el personaje** (luz de la escena, sin sombras, energía 0,75, radio 4,5 m): el Pollo Amarillo no se pierde bajo las copas. El camino conserva su valor de luna.
+
+### V.5 Evidencias
+- `capturas_c3/validacion/`: las **17 capturas** de la entrega C3 repetidas con **los mismos encuadres y horas** después del pulido.
+- `comparaciones_c3/antes_despues/`: **17 láminas** antes | después.
+- `pruebas_c3/validacion/recorrido_c3.mp4`: **video** del recorrido (720p, 24 fps), grabado con la escena real:
+  - de día: caminar, media vuelta, correr, girar la cámara a izquierda y derecha, subirla y bajarla, y caminar hasta las raíces del árbol monumental;
+  - de noche: lo mismo más corto.
+- `pruebas_c3/validacion/recorrido_fotogramas.jpg`: hoja de fotogramas del video.
+- Nota sobre el video: en el tramo de noche la cámara empieza con la inclinación que dejó la prueba de cámara del tramo de día, y el personaje queda en el borde inferior durante unos segundos. Después de grabarlo hice que cada recorrido empiece con la inclinación por defecto (la escena se lo indica al director, sin cambiarlo); el video no se ha vuelto a grabar (tarda una hora en CPU).
+- `pruebas_c3/validacion/`: también los resultados de las pruebas y la medición comparativa.
+
+### V.6 Archivos modificados (lista exacta)
+Ninguno nuevo dentro del proyecto. Se modificaron estos 5:
+| Archivo | Cambio |
+|---|---|
+| `scripts/anime/prueba_entorno_c3.gd` | Modo de recorrido con el personaje y la cámara del juego, colisiones, piloto de pruebas y video (`--recorrido`), luz nocturna sobre el personaje, pulido de copas, troncos y raíces hacia las rocas |
+| `assets/materials/anime/anime_suelo_selva_c3.gdshader` | Roderas a tramos, piedrecillas agrupadas, hojas caídas, charcos más suaves |
+| `tests/entorno_c3_tests.gd` | 14 pruebas nuevas (recorrido, choques, paseos, cámara, escala, luz nocturna) |
+| `tests/e2e_director.gd` | Espera las pruebas C3 (ahora usan física) y añade el modo `c3` |
+| `CHANGELOG.md` | Entrada de la validación |
+
+En la carpeta de entrega solo se añaden `PUNTO_CONTROL_C3.md` y las subcarpetas de evidencias dentro de las carpetas C3 ya existentes.
+
+### V.7 Pruebas ejecutadas (Godot 4.7.2.stable.official.ed1daf0bf)
+- `--mode=all`: **331 de 331 correctas** (antes 317; 14 nuevas). Incluye el juego completo de extremo a extremo (menú, selva, diálogo, combate, guardado y regreso), el mundo y el laboratorio anime.
+- `--mode=c3`: 35 de 35.
+- Capturas y video en Forward+ con Vulkan por software (lavapipe), sin errores de render.
+- **Medición comparativa** (lavapipe, CPU, encuadre general, no representativa de una GPU): 765 llamadas de dibujo antes y después; 1 348 843 triángulos antes y 1 392 171 después (+3 %, por las raíces nuevas y el cambio de especies). Las colisiones no se dibujan.
+
+### V.8 Errores y pendientes
+- **No he validado el rendimiento en una GPU real.** Las cifras son de lavapipe (CPU) y solo sirven para comparar antes y después.
+- Fuera del camino, una platanera o un tallo tapa a veces al personaje (entre el 1 y el 5 % de las muestras). Para evitarlo del todo habría que cambiar `DirectorCamaras._avoid_walls`, que lanza un único rayo desde el hombro y no desde la cabeza. **Es un sistema original del juego: no lo he tocado.** Si quieres, te explico el cambio y lo hacemos aparte.
+- La cámara al hombro no tiene en cuenta las hojas, porque las copas no tienen colisión. En el camino no tapan (0 %) porque ya no hay copas anchas cerca. Si un árbol de copa baja se pusiera junto al camino, podría tapar.
+- La colisión de los árboles usa la escala horizontal de cada árbol: la física no admite escalas no uniformes. Las ramas altas pueden estar hasta un 15 % más arriba o más abajo que su colisión; no afecta al personaje y casi nunca a la cámara.
+- El pulido cambia la colocación de algunos árboles junto al camino. Las láminas antes/después lo muestran.
+
+### V.9 Sistemas originales sin cambios
+No he modificado `CinematicPlayer`, `PlayerCinematic.tscn`, `DirectorCamaras`, `PlanosMundo`, `Mundo3D`, ni los controles, el combate, los diálogos, el guardado o el HUD. Tampoco el mapa de entradas ni ningún personaje. Comprobación: los únicos archivos del proyecto con fecha posterior al punto de control son los 5 de la lista V.6 (más los JSON de resultados que escribe el corredor de pruebas). La prueba de extremo a extremo del juego sigue pasando.
+
+---
+
 
 ## Revisión C3
 

@@ -1,0 +1,9 @@
+[recorrido] hora 13.0: caminar
+[recorrido] media vuelta
+[recorrido] correr
+[recorrido] cámara
+[recorrido] hacia el árbol monumental
+[recorrido] hora 21.0: caminar
+[recorrido] media vuelta
+[recorrido] correr
+[recorrido] cámara

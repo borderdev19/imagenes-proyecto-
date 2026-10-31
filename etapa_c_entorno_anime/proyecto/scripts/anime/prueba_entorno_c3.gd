@@ -16,9 +16,19 @@ extends PruebaEntornoC2
 ##   borde de luz de luna en las copas, camino algo más legible y luciérnagas con tres luces suaves.
 ##   La exposición general no se sube.
 ##
-## Teclas: 1-8 encuadre · H hora · O contornos · Esc menú (el estilo es siempre anime: la comparación
-## con la C2 se hace con su propia escena).
+## Validación con el personaje en movimiento: con C (o --jugar) se recorre la selva con el Pollo
+## Amarillo del juego (scenes/characters/PlayerCinematic.tscn) y la cámara al hombro del mundo
+## (DirectorCamaras con el plano "hombro" de PlanosMundo), sin cambiar ninguno de los dos. Troncos,
+## raíces, rocas, palmas, tronco caído y suelo tienen colisión (capa 1, la que usa la cámara para no
+## atravesar paredes); las plantas blandas se atraviesan y las piedrecillas y raíces bajas se suben
+## como escalones.
+##
+## Teclas: 1-8 encuadre · C caminar · H hora · O contornos · Esc menú (el estilo es siempre anime: la
+## comparación con la C2 se hace con su propia escena). Caminando: WASD, Shift correr, Q/R o arrastre
+## del ratón para girar la cámara, I/K para subirla o bajarla.
 ## Capturas: godot --path . res://scenes/pruebas/PruebaEntornoAnimeC3.tscn -- --capturas=/ruta
+## Video del recorrido: godot --path . --write-movie /ruta/recorrido.avi --fixed-fps 24
+##   res://scenes/pruebas/PruebaEntornoAnimeC3.tscn -- --recorrido
 
 const ESCENA_C3 := "res://scenes/pruebas/PruebaEntornoAnimeC3.tscn"
 const SEMILLA_C3 := 5151
@@ -26,6 +36,10 @@ const Esp2 := SelvaC2.Especie
 const Esp3 := SelvaC3.Especie
 ## Árbol monumental: punto focal al fondo del camino.
 const MONUMENTAL_Z := -46.0
+const JUGADOR := preload("res://scenes/characters/PlayerCinematic.tscn")
+## Zona caminable del modo de recorrido (x0, z0, ancho, fondo): el claro, el camino y el bosque cercano.
+const LIMITES := Rect2(-46.0, -96.0, 92.0, 120.0)
+const INICIO_Z := 10.0
 
 var especies_c3 := {}
 var _tipos_arbol := {}          # clave de variante -> {mesh, transforms}
@@ -35,9 +49,22 @@ var _copas_mat: Array[ShaderMaterial] = []
 var _suelo_mat: ShaderMaterial
 var _luciernagas_mat: ShaderMaterial
 var _luces_noche: Array[OmniLight3D] = []
+var luz_personaje: OmniLight3D  # relleno de luna que acompaña al personaje de noche
 var _monumental_pos := Vector3.ZERO
 var _por_planta := {}            # planta de la biblioteca -> transforms (MultiMesh)
 var mm_arboles := 0              # instancias de MultiMesh de árboles (para las pruebas)
+var _rocas_col: Array = []       # [malla, Transform3D] de las rocas con colisión
+var colision_obstaculos: StaticBody3D
+var colision_suelo: StaticBody3D
+# recorrido con el personaje del juego
+var jugador: CinematicPlayer
+var director: DirectorCamaras
+var jugando := false
+var _ruta: Array = []
+var _ruta_i := 0
+var _ruta_correr := false
+var _recorrido := false
+var _jugar_al_inicio := false
 
 
 func _ready() -> void:
@@ -50,6 +77,10 @@ func _ready() -> void:
 			_solo = a.substr(7).split(",")
 		elif a.begins_with("--medir="):
 			_medir_n = int(a.substr(8))
+		elif a == "--recorrido":
+			_recorrido = true
+		elif a == "--jugar":
+			_jugar_al_inicio = true
 	_entorno()
 	_cielo_c2()
 	_camara()
@@ -66,6 +97,7 @@ func _ready() -> void:
 	_tronco_caido()
 	_lianas_c3()
 	_noche_c3()
+	_colisiones()
 	_heroe()
 	_ui()
 	aplicar_estilo(Ajustes.ESTILO_ANIME)
@@ -74,6 +106,10 @@ func _ready() -> void:
 		_capturar.call_deferred()
 	elif _medir_n > 0:
 		_medir.call_deferred(_medir_n)
+	elif _recorrido:
+		_grabar_recorrido.call_deferred()
+	elif _jugar_al_inicio:
+		jugar.call_deferred(true)
 
 
 # ------------------------------------------------------------------ encuadres
@@ -123,12 +159,13 @@ func _bosque_c3() -> void:
 		m.set_shader_parameter("musgo_color", Vector3(0.06, 0.12, 0.03))
 		return m
 	var corteza := {
-		Esp2.CEIBA: cort.call("corteza_ceiba", Color(0.5, 0.46, 0.42), 0.15),
+		# (pulido: ceiba, higuera y cecropia más oscuras y cálidas; antes destacaban como troncos blancos)
+		Esp2.CEIBA: cort.call("corteza_ceiba", Color(0.42, 0.36, 0.3), 0.18),
 		Esp2.REDONDA: cort.call("corteza_redonda", Color(0.38, 0.27, 0.2), 0.2),
 		Esp2.JOVEN: cort.call("corteza_joven", Color(0.4, 0.32, 0.23), 0.0),
-		Esp3.MONUMENTAL: cort.call("corteza_higuera", Color(0.47, 0.43, 0.37), 0.3),
+		Esp3.MONUMENTAL: cort.call("corteza_higuera", Color(0.4, 0.34, 0.27), 0.3),
 		Esp3.PISOS: cort.call("corteza_pisos", Color(0.35, 0.28, 0.23), 0.15),
-		Esp3.CECROPIA: cort.call("corteza_cecropia", Color(0.62, 0.6, 0.54), 0.1),
+		Esp3.CECROPIA: cort.call("corteza_cecropia", Color(0.48, 0.44, 0.37), 0.2),
 		Esp3.INCLINADO: cort.call("corteza_inclinado", Color(0.33, 0.24, 0.17), 0.25),
 	}
 	# verdes por especie: [hoja en sombra, hoja iluminada]; cada variante toma uno
@@ -162,7 +199,8 @@ func _bosque_c3() -> void:
 	_poner_arbol(Esp3.INCLINADO, 0, Vector3(SelvaC2.camino_x(-12.0) - 4.6, 0, -12.0), -8.0, Vector3.ONE, variantes, false)
 	_poner_arbol(Esp3.INCLINADO, 1, Vector3(SelvaC2.camino_x(-31.0) + 4.8, 0, -31.0), 172.0, Vector3(1.0, 0.95, 1.0), variantes, false)
 	_poner_arbol(Esp2.CEIBA, 0, Vector3(-11.0, 0, -20.0), 30.0, Vector3.ONE, variantes, false)
-	_poner_arbol(Esp3.PISOS, 0, Vector3(7.5, 0, -6.5), 0.0, Vector3.ONE * 0.9, variantes, false)
+	# (pulido: el árbol en pisos se aparta del camino; su copa de 6 m lo cubría entero)
+	_poner_arbol(Esp3.PISOS, 0, Vector3(10.5, 0, -7.5), 0.0, Vector3.ONE * 0.85, variantes, false)
 	_poner_arbol(Esp3.CECROPIA, 0, Vector3(-6.0, 0, -4.0), 0.0, Vector3.ONE, variantes, false)
 	_poner_arbol(Esp2.REDONDA, 0, Vector3(-7.0, 0, -9.5), 60.0, Vector3.ONE, variantes, false)
 	_poner_arbol(Esp2.JOVEN, 0, Vector3(-5.5, 0, 6.0), 0.0, Vector3.ONE, variantes, false)
@@ -179,12 +217,19 @@ func _bosque_c3() -> void:
 		if dc < 4.4 or (p.z > 6.0 and dc < 9.0) or _en_zona_camara(p, 3.5) or _en_corredor(p):
 			continue
 		var esp: int = _elegir(cerca_pesos if dc < 12.0 else lejos_pesos, rng)
+		# pulido: junto al camino no van copas anchas (saturaban la mitad superior de la imagen y tapaban
+		# el cielo del camino); en su lugar, especies de copa alta y estrecha
+		var junto := dc < 7.5
+		if junto and esp in [Esp2.REDONDA, Esp3.PISOS, Esp2.CEIBA]:
+			esp = Esp3.CECROPIA if int(absf(p.z)) % 2 == 0 else Esp2.JOVEN
 		if not _libre(p, float(radio[esp])):
 			continue
 		if esp == -1:
 			_palma(p, rng)
 		else:
 			var s := rng.randf_range(0.82, 1.2)
+			if junto:
+				s = minf(s, 1.0)
 			var giro := rng.randf() * 360.0
 			if esp == Esp3.INCLINADO:
 				# se inclina hacia el camino
@@ -312,6 +357,9 @@ func _rocas_c3_crear() -> void:
 		p.y = SelvaC2.altura_suelo(p.x, p.z, SEMILLA_C2) - tam.y * 0.18
 		var b := Basis(Vector3.UP, giro) * Basis(Vector3(1, 0, 0), rng.randf_range(-0.08, 0.08))
 		(por_clave[clave] as Array).append(Transform3D(b.scaled(tam), p))
+		# las piedrecillas no tienen colisión: se pisan como el suelo
+		if mesh_i < 8 and tam.x > 0.2:
+			_rocas_col.append([variantes[mesh_i], Transform3D(b.scaled(tam), p)])
 	var n := 0
 	for g in grupos:
 		var c: Vector3 = g[0]
@@ -394,6 +442,34 @@ func _raices_camino() -> void:
 		var otra := Vector3(rng.randf_range(-1, 1), 0, rng.randf_range(-1, 1)).normalized()
 		SelvaC3.raiz(st, Vector3(p.x, SelvaC2.altura_suelo(p.x, p.z, SEMILLA_C2), p.z) + otra * 0.4, otra, 0.7, rng.randf_range(2.0, 4.0), 0.18, rng)
 		n += 1
+	# pulido: raíces que llegan a los grupos de rocas y los rodean (la roca queda trabada entre raíces)
+	for r in _rocas_c3:
+		if r.z < 0.7:
+			continue
+		var c := Vector3(r.x, 0, r.y)
+		var mejor := Vector4.INF
+		for h in _huellas:
+			var d := Vector2(h.x - c.x, h.y - c.z).length()
+			if d > 2.0 and d < 9.0 and (mejor == Vector4.INF or d < Vector2(mejor.x - c.x, mejor.y - c.z).length()):
+				mejor = h
+		if mejor == Vector4.INF:
+			continue
+		var base := Vector3(mejor.x, 0, mejor.y)
+		base.y = SelvaC2.altura_suelo(base.x, base.z, SEMILLA_C2)
+		var hacia := (c - base)
+		hacia.y = 0.0
+		var largo := hacia.length()
+		hacia = hacia.normalized()
+		var lado := hacia.cross(Vector3.UP)
+		# dos raíces que pasan por los lados de la roca, sin entrar en el camino
+		for sgn in [-1.0, 1.0]:
+			# bajas y separadas de la roca: no hacen de escalera para subirse encima
+			var dir: Vector3 = (hacia * largo + lado * float(sgn) * (r.z + 0.6)).normalized()
+			var fin: Vector3 = base + dir * (largo + r.z * 0.6)
+			if SelvaC2.distancia_camino(fin) < 1.6:
+				continue
+			SelvaC3.raiz(st, base + dir * 0.4, dir, rng.randf_range(0.3, 0.42), largo + r.z * 0.6, rng.randf_range(0.13, 0.18), rng)
+			n += 1
 	var mi := _malla(st.commit(), Vector3.ZERO)
 	mi.name = "Raices_C3"
 	var m := EstiloAnime.material_entorno({"nombre": "raiz", "tex": _tex("corteza_col.jpg"), "color": Color(0.36, 0.28, 0.21).srgb_to_linear(), "escala": 0.6,
@@ -532,6 +608,28 @@ func _noche_c3() -> void:
 		l.position = Vector3(SelvaC2.camino_x(z) + (3.0 if int(z) % 2 == 0 else -3.0), 1.4, z)
 		add_child(l)
 		_luces_noche.append(l)
+	# relleno frío y suave sobre el personaje: de noche no se pierde en la sombra de las copas. Es una
+	# luz de la escena (no del personaje) y no proyecta sombras.
+	luz_personaje = OmniLight3D.new()
+	luz_personaje.name = "Luz_personaje"
+	luz_personaje.light_color = Color(0.62, 0.76, 1.0)
+	luz_personaje.omni_range = 4.5
+	luz_personaje.omni_attenuation = 1.4
+	luz_personaje.shadow_enabled = false
+	luz_personaje.visible = false
+	add_child(luz_personaje)
+
+
+## Coloca el relleno nocturno sobre el personaje visible (el jugable o el del plano de escala).
+func _luz_sobre_personaje() -> void:
+	if luz_personaje == null:
+		return
+	var quien: Node3D = jugador if jugando else amarillo
+	var nf := factor_noche(hora)
+	luz_personaje.visible = nf > 0.3 and quien != null and quien.visible
+	if luz_personaje.visible:
+		luz_personaje.global_position = quien.global_position + Vector3(0.3, 2.3, 0.5)
+		luz_personaje.light_energy = 0.75 * nf
 
 
 ## 1 de noche cerrada, 0 de día, con rampas al anochecer y al amanecer.
@@ -568,9 +666,284 @@ func _luz_anime(h: float) -> void:
 	for l in _luces_noche:
 		l.visible = nf > 0.3
 		l.light_energy = 0.9 * nf
+	_luz_sobre_personaje()
+
+
+# ------------------------------------------------------------------ colisiones
+## Colisión de lo que no se puede atravesar, en la capa 1 (el personaje y la cámara al hombro la usan):
+## corteza de cada árbol (tronco, raíces del pie y ramas, de la propia malla), raíces del camino, rocas
+## medianas y grandes, tronco caído, troncos de palmas y helechos arborescentes y tallos de plataneras.
+## Monsteras, arbustos, helechos y hierbas se atraviesan (son blandos); las piedrecillas y las raíces
+## bajas se suben como escalones (step_height del personaje). El suelo va en su propio cuerpo.
+func _colisiones() -> void:
+	colision_suelo = StaticBody3D.new()
+	colision_suelo.name = "Colision_Suelo"
+	add_child(colision_suelo)
+	var suelo: MeshInstance3D = find_child("Suelo_Selva_C3", false, false)
+	_forma(colision_suelo, suelo.mesh.create_trimesh_shape(), Transform3D.IDENTITY)
+	colision_obstaculos = StaticBody3D.new()
+	colision_obstaculos.name = "Colision_Obstaculos"
+	add_child(colision_obstaculos)
+	var zona := LIMITES.grow(12.0)
+	var formas := {}
+	var n := 0
+	for clave in _tipos_arbol:
+		var t: Dictionary = _tipos_arbol[clave]
+		var mesh: ArrayMesh = t["mesh"]
+		for tr in t["ts"]:
+			var o: Vector3 = (tr as Transform3D).origin
+			if not zona.has_point(Vector2(o.x, o.z)):
+				continue
+			if not formas.has(mesh):
+				formas[mesh] = _caras(mesh, 0)
+			# escala uniforme (la de la planta del árbol): la física no admite escalas no uniformes
+			var b: Basis = (tr as Transform3D).basis
+			_forma(colision_obstaculos, formas[mesh], Transform3D(b.orthonormalized().scaled(Vector3.ONE * b.x.length()), o))
+			n += 1
+	stats["colision_arboles"] = n
+	for r in _rocas_col:
+		var mesh: Mesh = r[0]
+		if not formas.has(mesh):
+			formas[mesh] = mesh.create_convex_shape(true, true)
+		_forma(colision_obstaculos, formas[mesh], r[1])
+	stats["colision_rocas"] = _rocas_col.size()
+	for nom in ["Raices_C3", "Tronco_caido"]:
+		var mi: MeshInstance3D = find_child(nom, false, false)
+		if mi:
+			_forma(colision_obstaculos, _caras(mi.mesh, 0), mi.transform)
+	# tallos de la biblioteca: corteza de palmas y helechos arborescentes, cilindro en las plataneras
+	var lib := _biblioteca()
+	for nom in _por_planta:
+		var tallo := -1
+		if String(nom).begins_with("Palma") or String(nom).begins_with("Helecho_Arbol"):
+			tallo = 1
+		elif not String(nom).begins_with("Platanera"):
+			continue
+		for tr in _por_planta[nom]:
+			var t := tr as Transform3D
+			if tallo >= 0 and lib.has(nom):
+				var m: Mesh = lib[nom]
+				if not formas.has(m):
+					formas[m] = _caras(m, tallo)
+				_forma(colision_obstaculos, formas[m], t)
+			else:
+				var c := CylinderShape3D.new()
+				c.radius = 0.32 * t.basis.x.length()
+				c.height = 1.6
+				_forma(colision_obstaculos, c, Transform3D(Basis(), t.origin + Vector3(0, 0.8, 0)))
+	stats["formas_colision"] = colision_obstaculos.get_child_count()
+
+
+func _forma(cuerpo: StaticBody3D, forma: Shape3D, t: Transform3D) -> void:
+	var cs := CollisionShape3D.new()
+	cs.shape = forma
+	cs.transform = t
+	cuerpo.add_child(cs)
+
+
+## Triángulos de una superficie como forma cóncava (con caras traseras: los tubos se ven desde fuera
+## y desde dentro de los arcos de raíces).
+static func _caras(mesh: Mesh, sf: int) -> ConcavePolygonShape3D:
+	var a := mesh.surface_get_arrays(sf)
+	var v: PackedVector3Array = a[Mesh.ARRAY_VERTEX]
+	var caras := v
+	if a[Mesh.ARRAY_INDEX] is PackedInt32Array and not (a[Mesh.ARRAY_INDEX] as PackedInt32Array).is_empty():
+		var idx: PackedInt32Array = a[Mesh.ARRAY_INDEX]
+		caras = PackedVector3Array()
+		caras.resize(idx.size())
+		for i in idx.size():
+			caras[i] = v[idx[i]]
+	var s := ConcavePolygonShape3D.new()
+	s.backface_collision = true
+	s.set_faces(caras)
+	return s
+
+
+# ------------------------------------------------------------------ recorrido con el personaje
+## Modo de recorrido: el Pollo Amarillo jugable del juego con la cámara al hombro del mundo. El
+## personaje y el director de cámaras se usan tal cual; la escena solo les da la zona caminable y la
+## base de la cámara cada fotograma (lo mismo que hace Mundo3D).
+func jugar(activo := true) -> void:
+	if activo == jugando:
+		return
+	jugando = activo
+	if not activo:
+		_soltar()
+		_ruta = []
+		jugador.visible = false
+		jugador.process_mode = Node.PROCESS_MODE_DISABLED
+		RenderingServer.global_shader_parameter_set("jugador_pos", Vector3(0, -1000, 0))
+		set_plano("general")
+		_luz_sobre_personaje()
+		return
+	if jugador == null:
+		jugador = JUGADOR.instantiate()
+		jugador.name = "Jugador"
+		add_child(jugador)
+		jugador.walk_check = _caminable
+		jugador.add_child(CombatStage.make_blob_shadow(0.45))
+		director = DirectorCamaras.new()
+		director.name = "DirectorCamaras"
+		add_child(director)
+		director.setup(cam, jugador, PlanosMundo.build(null))
+	jugador.visible = true
+	jugador.process_mode = Node.PROCESS_MODE_INHERIT
+	if amarillo:
+		amarillo.visible = false
+	var x := SelvaC2.camino_x(INICIO_Z)
+	# de espaldas a la cámara, mirando hacia el fondo del camino (-z)
+	jugador.place(Vector3(x, SelvaC2.altura_suelo(x, INICIO_Z, SEMILLA_C2) + 0.05, INICIO_Z), PI)
+	# cada recorrido empieza con la inclinación por defecto de la cámara al hombro
+	director.pitch = deg_to_rad(-13.0)
+	director.set_shot("hombro")
+	director.update(1.0 / 60.0)
+	jugador.on_camera_cut(director.view_basis())
+	plano = "recorrido"
+	_refresh_info()
+
+
+func _caminable(p: Vector3) -> bool:
+	return LIMITES.has_point(Vector2(p.x, p.z))
+
+
+func _physics_process(delta: float) -> void:
+	if not jugando:
+		return
+	_piloto()
+	director.update(delta)
+	jugador.view_basis = director.view_basis()
+	RenderingServer.global_shader_parameter_set("jugador_pos", jugador.global_position)
+	_luz_sobre_personaje()
+
+
+func _exit_tree() -> void:
+	_soltar()
+	RenderingServer.global_shader_parameter_set("jugador_pos", Vector3(0, -1000, 0))
+
+
+## Puntos del eje del camino entre dos z, cada 'paso' metros.
+static func puntos_camino(z0: float, z1: float, paso := 3.0) -> Array:
+	var pts := []
+	var n := maxi(1, ceili(absf(z1 - z0) / paso))
+	for i in n + 1:
+		var z := lerpf(z0, z1, float(i) / float(n))
+		var x := SelvaC2.camino_x(z)
+		pts.append(Vector3(x, SelvaC2.altura_suelo(x, z, SEMILLA_C2), z))
+	return pts
+
+
+## Piloto para las pruebas y el video: conduce al personaje por una lista de puntos pulsando las mismas
+## acciones que el jugador (move_* relativas a la cámara y run), sin atajos en el controlador.
+func pilotar(puntos: Array, correr := false) -> void:
+	_ruta = puntos
+	_ruta_i = 0
+	_ruta_correr = correr
+
+
+func pilotando() -> bool:
+	return _ruta_i < _ruta.size()
+
+
+func _piloto() -> void:
+	if not pilotando():
+		return
+	var to := Vector3.ZERO
+	while _ruta_i < _ruta.size():
+		to = (_ruta[_ruta_i] as Vector3) - jugador.global_position
+		to.y = 0.0
+		var ultimo := _ruta_i == _ruta.size() - 1
+		if to.length() > (0.35 if ultimo else 1.2):
+			break
+		_ruta_i += 1
+	if not pilotando():
+		_soltar()
+		return
+	var b := jugador.view_basis
+	var fwd := -b.z
+	fwd.y = 0.0
+	var right := b.x
+	right.y = 0.0
+	var d := to.normalized()
+	var iv := Vector2(d.dot(right.normalized()), -d.dot(fwd.normalized()))
+	if _ruta_i == _ruta.size() - 1:
+		iv *= clampf(to.length() / 0.8, 0.4, 1.0)
+	Input.action_press("move_right", maxf(iv.x, 0.0))
+	Input.action_press("move_left", maxf(-iv.x, 0.0))
+	Input.action_press("move_back", maxf(iv.y, 0.0))
+	Input.action_press("move_forward", maxf(-iv.y, 0.0))
+	if _ruta_correr:
+		Input.action_press("run")
+	else:
+		Input.action_release("run")
+
+
+func _soltar() -> void:
+	for a in ["move_right", "move_left", "move_back", "move_forward", "run", "cam_left", "cam_right", "cam_up", "cam_down"]:
+		if InputMap.has_action(a):
+			Input.action_release(a)
+
+
+## Mantiene pulsada una acción (giro de cámara) durante unos segundos de juego.
+func mantener(accion: String, segundos: float) -> void:
+	var t := 0.0
+	while t < segundos:
+		Input.action_press(accion)
+		await get_tree().physics_frame
+		t += get_physics_process_delta_time()
+	Input.action_release(accion)
+
+
+func esperar_ruta(limite := 40.0) -> bool:
+	var t := 0.0
+	while pilotando() and t < limite:
+		await get_tree().physics_frame
+		t += get_physics_process_delta_time()
+	return not pilotando()
+
+
+## Video de validación: caminar, media vuelta, correr, girar la cámara y acercarse al árbol monumental,
+## de día y de noche. Se graba con --write-movie (ver la cabecera).
+func _grabar_recorrido() -> void:
+	Ajustes.contornos = true
+	for h in [13.0, 21.0]:
+		hora = h
+		aplicar_estilo(Ajustes.ESTILO_ANIME)
+		jugar(true)
+		await get_tree().create_timer(0.8).timeout
+		print("[recorrido] hora %.1f: caminar" % h)
+		pilotar(puntos_camino(INICIO_Z, -2.0))
+		await esperar_ruta()
+		print("[recorrido] media vuelta")
+		var p := jugador.global_position
+		pilotar([p + Vector3(0, 0, 2.5), p + Vector3(0.3, 0, 3.0)])
+		await esperar_ruta()
+		await get_tree().create_timer(0.4).timeout
+		pilotar([p + Vector3(0, 0, -1.0)])
+		await esperar_ruta()
+		print("[recorrido] correr")
+		pilotar(puntos_camino(-2.0, -30.0 if h == 13.0 else -18.0), true)
+		await esperar_ruta()
+		await get_tree().create_timer(0.5).timeout
+		print("[recorrido] cámara")
+		await mantener("cam_left", 2.4)
+		await mantener("cam_right", 2.4)
+		await mantener("cam_up", 0.7)
+		await mantener("cam_down", 1.2)
+		if h == 13.0:
+			print("[recorrido] hacia el árbol monumental")
+			pilotar(puntos_camino(-30.0, MONUMENTAL_Z + 6.0) + [_monumental_pos + Vector3(-6.5, 0, 6.0)])
+			await esperar_ruta()
+			await get_tree().create_timer(1.0).timeout
+		jugar(false)
+	get_tree().quit()
 
 
 # ------------------------------------------------------------------ estado
+func set_plano(n: String) -> void:
+	super(n)
+	_luz_sobre_personaje()
+
+
 func aplicar_estilo(_e: int) -> void:
 	super(Ajustes.ESTILO_ANIME)
 
@@ -578,8 +951,8 @@ func aplicar_estilo(_e: int) -> void:
 func _refresh_info() -> void:
 	if _info == null:
 		return
-	_info.text = "ENTORNO ANIME C3 · hora %.1f · plano: %s · contornos: %s\n1-8 plano · H hora · O contornos · Esc menú" % [
-		hora, plano, "sí" if Ajustes.contornos else "no"]
+	_info.text = "ENTORNO ANIME C3 · hora %.1f · plano: %s · contornos: %s\n%s" % [hora, plano, "sí" if Ajustes.contornos else "no",
+		"WASD mover · Shift correr · Q/R o ratón: cámara · I/K altura · C salir del recorrido" if jugando else "1-8 plano · C caminar · H hora · O contornos · Esc menú"]
 
 
 func _unhandled_input(ev: InputEvent) -> void:
@@ -587,6 +960,11 @@ func _unhandled_input(ev: InputEvent) -> void:
 		var k := (ev as InputEventKey).keycode
 		if k == KEY_TAB:
 			return
+		if k == KEY_C:
+			jugar(not jugando)
+			return
+		if jugando and k >= KEY_1 and k <= KEY_8:
+			jugar(false)
 		if k == KEY_8:
 			set_plano("raices")
 			return
