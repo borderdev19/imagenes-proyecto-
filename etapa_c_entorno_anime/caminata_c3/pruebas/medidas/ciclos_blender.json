@@ -1,0 +1,22 @@
+{
+ "idle": {
+  "frames": 60,
+  "suela_min": -0.0,
+  "pct_sin_pie_en_suelo": 0.0,
+  "desliz_relativo": 0.0
+ },
+ "walk": {
+  "frames": 24,
+  "suela_min": -0.005,
+  "pct_sin_pie_en_suelo": 0.0,
+  "desliz_relativo": 0.058,
+  "no_alcanza_mm": 0.0
+ },
+ "run": {
+  "frames": 16,
+  "suela_min": -0.0038,
+  "pct_sin_pie_en_suelo": 35.3,
+  "desliz_relativo": 0.002,
+  "no_alcanza_mm": 0.0
+ }
+}

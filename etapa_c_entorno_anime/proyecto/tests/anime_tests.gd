@@ -24,7 +24,9 @@ const ORIGINALES := {
 	"res://assets/materials/mundo/planta.gdshader": "e03f06c5a83a006d9176c507d11970e9",
 	"res://assets/materials/mundo/terreno.gdshader": "f6fb666afbd98238ecbc9532cb785e2b",
 	"res://assets/materials/post/pintura.gdshader": "32a63f641f2caef0caef5527baff2d77",
-	"res://assets/characters/pollo_amarillo.glb": "6a8462bd55186262d3b97e50ba86f42b",
+	# regenerado en la corrección de la caminata de la C3 (blender/scripts/locomocion_heroe.py): mismas malla y
+	# texturas, piernas recolocadas y walk/run/idle con pies plantados (el de antes: 6a8462bd55186262d3b97e50ba86f42b)
+	"res://assets/characters/pollo_amarillo.glb": "ea2d2fef9c7a65ab9e1986ca4fd2a4ec",
 	"res://assets/characters/pollo_negro.glb": "38c9b0ca9ae09ead063b23658c2e017c",
 	"res://assets/mundo3d/mundo.glb": "1353b6116ddc7538e3c26d0832e4408b",
 	"res://assets/mundo3d/biblioteca.glb": "f1d3fe0a189a6420ca29b6cc309c91d6",

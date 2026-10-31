@@ -32,6 +32,9 @@ func _run_suite() -> void:
 		var c3 = preload("res://tests/entorno_c3_tests.gd").new()
 		all += await c3.run_all(get_tree())
 		await run_laboratorio_anime()
+	if mode in ["all", "unit", "locomocion"]:
+		# caminata del Pollo Amarillo sobre suelo plano (pisada medida en el esqueleto)
+		all += await preload("res://tests/locomocion_tests.gd").new().run_all(get_tree())
 	if mode == "c3":
 		# solo el entorno C3 con el recorrido del personaje (iteración rápida)
 		all += await preload("res://tests/entorno_c3_tests.gd").new().run_all(get_tree())

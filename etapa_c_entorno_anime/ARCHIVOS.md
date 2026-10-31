@@ -2,6 +2,20 @@
 
 Las rutas de `proyecto/` son las mismas que dentro del proyecto Godot (`res://`).
 
+## Corrección de la caminata del personaje en la C3 (2026-10-31)
+
+Informe: [`caminata_c3/INFORME_CAMINATA_C3.md`](caminata_c3/INFORME_CAMINATA_C3.md). Videos del resultado en
+`caminata_c3/videos/`, láminas en `caminata_c3/comparaciones/`, medidas y pruebas en `caminata_c3/pruebas/`.
+
+| Archivo | Cambio |
+|---|---|
+| `proyecto/blender/scripts/locomocion_heroe.py` | **Nuevo.** Rig de piernas en la malla + idle/walk/run con pies plantados (IK horneada) |
+| `proyecto/assets/characters/pollo_amarillo.glb` | Regenerado con ese script (misma malla y texturas) |
+| `proyecto/scripts/selva/cinematic_player.gd` | Caminar 1,7 m/s, animación sincronizada con la zancada, caminar/correr con fase conservada |
+| `proyecto/scripts/player/chicken_visual.gd` | `play_ciclo()` y `fase_ciclo()` añadidos |
+| `proyecto/tests/locomocion_tests.gd`, `proyecto/tests/tools/medidor_pisada.gd`, `proyecto/tests/tools/sonda_locomocion.gd`, `proyecto/tests/tools/SondaLocomocion.tscn` | **Nuevos.** Pruebas y sonda de videos |
+| `proyecto/tests/e2e_director.gd`, `proyecto/tests/anime_tests.gd`, `proyecto/tests/entorno_c3_tests.gd`, `proyecto/CHANGELOG.md` | Modo `locomocion`, huella del GLB nuevo, velocidad de caminar leída del controlador |
+
 ## Validación y pulido de la C3
 
 ### Modificados (ningún archivo nuevo en el proyecto)

@@ -299,7 +299,7 @@ func test_recorrido(tree: SceneTree, c3: PruebaEntornoC3) -> void:
 		ok1 and ok2 and rescates[0] == 0 and float(mc.get("atasco", 0.0)) < 0.5 and float(mr.get("atasco", 0.0)) < 0.5,
 		"caminar %s, correr %s, rescates %d, atasco %.2f s / %.2f s, llega a z %.1f" % [ok1, ok2, rescates[0], float(mc.get("atasco", 0.0)), float(mr.get("atasco", 0.0)), j.global_position.z])
 	check("C3 recorrido: camina a la velocidad del juego y corre con la tecla de correr",
-		float(mc["vmax"]) > 2.0 and float(mc["vmax"]) < 2.6 and float(mr["vmax"]) > 4.0, "caminar %.2f m/s, correr %.2f m/s" % [float(mc["vmax"]), float(mr["vmax"])])
+		absf(float(mc["vmax"]) - j.walk_speed) < 0.3 and float(mr["vmax"]) > 4.0, "caminar %.2f m/s, correr %.2f m/s" % [float(mc["vmax"]), float(mr["vmax"])])
 	# media vuelta
 	var p := j.global_position
 	var y0 := j.facing_yaw

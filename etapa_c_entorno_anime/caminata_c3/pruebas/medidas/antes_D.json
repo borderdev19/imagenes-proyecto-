@@ -1,0 +1,62 @@
+{
+  "camino_caminar": {
+    "desliz_pct_velocidad": 96.3,
+    "desliz_pie_apoyado_ms": 2.111,
+    "flexion_rodilla_max": 74.4,
+    "muestras": 435,
+    "pct_rodilla_no_al_frente": 0.0,
+    "pct_sin_pie_en_suelo": 24.8,
+    "pct_suela_hundida_2cm": 29.9,
+    "pie_mas_bajo_max_m": 0.062,
+    "punta_apoyada_desvio_max": 41.7,
+    "punta_apoyada_desvio_medio": 22.8,
+    "suela_min_m": -0.073,
+    "vel_tobillo_max_ms": 3.54,
+    "velocidad_media": 2.19
+  },
+  "camino_correr": {
+    "desliz_pct_velocidad": 65.2,
+    "desliz_pie_apoyado_ms": 2.642,
+    "flexion_rodilla_max": 122.0,
+    "muestras": 219,
+    "pct_rodilla_no_al_frente": 0.0,
+    "pct_sin_pie_en_suelo": 71.7,
+    "pct_suela_hundida_2cm": 10.5,
+    "pie_mas_bajo_max_m": 0.137,
+    "punta_apoyada_desvio_max": 35.5,
+    "punta_apoyada_desvio_medio": 19.4,
+    "suela_min_m": -0.066,
+    "vel_tobillo_max_ms": 6.67,
+    "velocidad_media": 4.05
+  },
+  "camino_detenerse": {
+    "desliz_pct_velocidad": 81.3,
+    "desliz_pie_apoyado_ms": 0.367,
+    "flexion_rodilla_max": 110.9,
+    "muestras": 72,
+    "pct_rodilla_no_al_frente": 0.0,
+    "pct_sin_pie_en_suelo": 15.3,
+    "pct_suela_hundida_2cm": 41.0,
+    "pie_mas_bajo_max_m": 0.079,
+    "punta_apoyada_desvio_max": 39.5,
+    "punta_apoyada_desvio_medio": 25.9,
+    "suela_min_m": -0.063,
+    "vel_tobillo_max_ms": 12.98,
+    "velocidad_media": 0.45
+  },
+  "todo": {
+    "desliz_pct_velocidad": 72.3,
+    "desliz_pie_apoyado_ms": 1.865,
+    "flexion_rodilla_max": 122.0,
+    "muestras": 726,
+    "pct_rodilla_no_al_frente": 0.0,
+    "pct_sin_pie_en_suelo": 38.0,
+    "pct_suela_hundida_2cm": 25.1,
+    "pie_mas_bajo_max_m": 0.137,
+    "punta_apoyada_desvio_max": 41.7,
+    "punta_apoyada_desvio_medio": 22.9,
+    "suela_min_m": -0.073,
+    "vel_tobillo_max_ms": 12.98,
+    "velocidad_media": 2.58
+  }
+}

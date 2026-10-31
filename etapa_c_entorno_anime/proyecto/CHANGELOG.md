@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## Etapa C anime, corrección de la caminata del Pollo Amarillo en la C3 (2026-10-31)
+
+Sobre la rama C3, sin etapas ni escenas de juego nuevas. Solo el sistema que causaba el problema.
+
+- Causa principal: el esqueleto del modelo de Meshy tenía las articulaciones de las piernas colocadas en
+  posiciones simétricas, pero el modelo está de pie en una guardia abierta y asimétrica (pie izquierdo
+  18 cm adelantado, botas giradas 25° y 43° hacia fuera). Rodillas y tobillos quedaban 6–14 cm fuera del
+  eje de la pierna y las botas giraban alrededor de un punto fuera del tobillo. Las animaciones de
+  desplazamiento eran cuatro poses por rotación directa sin contacto con el suelo, la velocidad (2,3 m/s)
+  no correspondía a la zancada y los ciclos repetían un fotograma en cada vuelta.
+- `blender/scripts/locomocion_heroe.py` (nuevo): recoloca las articulaciones de las piernas en la malla,
+  recalcula solo los pesos de la parte baja y genera idle/walk/run con pies plantados (IK analítica
+  horneada a claves; el GLB no lleva IK en tiempo real). El resto de acciones se regenera con las mismas
+  definiciones de `chicken_rig.py`. Malla, texturas y pesos del tronco, brazos y cabeza sin cambios.
+- `assets/characters/pollo_amarillo.glb` y `blender/characters/pollo_amarillo.blend` regenerados con ese
+  script (copias de antes en `selva/respaldo/caminata_c3/` de los archivos del proyecto).
+- `scripts/selva/cinematic_player.gd`: caminar a 1,7 m/s (antes 2,3), la animación se reproduce a la
+  velocidad que hace coincidir zancada y desplazamiento (`walk_stride`, `run_stride`), cambio
+  caminar/correr con histéresis y fase conservada, pisadas al ritmo real del pie, inclinación del cuerpo
+  más pequeña (hundía las botas).
+- `scripts/player/chicken_visual.gd`: `play_ciclo()` y `fase_ciclo()` (añadidos; `play()` no cambia).
+- Pruebas: `tests/locomocion_tests.gd` (modo `locomocion`, también en `all` y `unit`),
+  `tests/tools/medidor_pisada.gd`, sonda de videos `tests/tools/SondaLocomocion.tscn` (pruebas A–D).
+
 ## Etapa C anime, validación y pulido de la C3 (2026-10-30)
 
 Sobre la misma escena C3 (sin escenas, scripts ni carpetas nuevas). Validada con Godot 4.7.2.
